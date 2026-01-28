@@ -107,3 +107,7 @@ Desktop.ini
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# Release packages
+*.zip
+*.msi
