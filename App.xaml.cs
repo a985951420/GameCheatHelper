@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Drawing;
@@ -21,6 +22,7 @@ namespace GameCheatHelper
             // 设置全局异常处理
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -152,6 +154,27 @@ namespace GameCheatHelper
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
             }
+        }
+
+        /// <summary>
+        /// Task未观察到的异常
+        /// </summary>
+        private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+        {
+            Logger.Error(e.Exception, "Task中发生未观察到的异常");
+
+            // 标记异常已观察，防止程序崩溃
+            e.SetObserved();
+
+            // 在UI线程上显示错误信息
+            Dispatcher.Invoke(() =>
+            {
+                System.Windows.MessageBox.Show(
+                    $"后台任务发生错误:\n{e.Exception.InnerException?.Message ?? e.Exception.Message}\n\n错误已记录，程序将继续运行。",
+                    "后台任务错误",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            });
         }
     }
 }
