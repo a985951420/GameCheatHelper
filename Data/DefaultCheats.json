@@ -1,0 +1,225 @@
+{
+  "version": "1.0.0",
+  "cheats": {
+    "warcraft3": [
+      {
+        "id": "wc3_greedisgood",
+        "game": 1,
+        "code": "greedisgood",
+        "description": "获得500金和木材",
+        "category": "资源",
+        "enabled": true
+      },
+      {
+        "id": "wc3_greedisgood_large",
+        "game": 1,
+        "code": "greedisgood 999999",
+        "description": "获得999999金和木材",
+        "category": "资源",
+        "enabled": true
+      },
+      {
+        "id": "wc3_keysersoze",
+        "game": 1,
+        "code": "keysersoze",
+        "description": "获得500金币",
+        "category": "资源",
+        "enabled": true
+      },
+      {
+        "id": "wc3_leafittome",
+        "game": 1,
+        "code": "leafittome",
+        "description": "获得500木材",
+        "category": "资源",
+        "enabled": true
+      },
+      {
+        "id": "wc3_iseedeadpeople",
+        "game": 1,
+        "code": "iseedeadpeople",
+        "description": "显示全图",
+        "category": "地图",
+        "enabled": true
+      },
+      {
+        "id": "wc3_whosyourdaddy",
+        "game": 1,
+        "code": "whosyourdaddy",
+        "description": "无敌模式",
+        "category": "战斗",
+        "enabled": true
+      },
+      {
+        "id": "wc3_thereisnospoon",
+        "game": 1,
+        "code": "thereisnospoon",
+        "description": "无限魔法",
+        "category": "战斗",
+        "enabled": true
+      },
+      {
+        "id": "wc3_strengthandhonor",
+        "game": 1,
+        "code": "strengthandhonor",
+        "description": "不会失败（无法战败）",
+        "category": "游戏",
+        "enabled": true
+      },
+      {
+        "id": "wc3_itvexesme",
+        "game": 1,
+        "code": "itvexesme",
+        "description": "不会胜利（无法获胜）",
+        "category": "游戏",
+        "enabled": true
+      },
+      {
+        "id": "wc3_somebodysetupusthebomb",
+        "game": 1,
+        "code": "somebodysetupusthebomb",
+        "description": "立即失败",
+        "category": "游戏",
+        "enabled": true
+      },
+      {
+        "id": "wc3_pointbreak",
+        "game": 1,
+        "code": "pointbreak",
+        "description": "移除食物上限",
+        "category": "资源",
+        "enabled": true
+      },
+      {
+        "id": "wc3_warpten",
+        "game": 1,
+        "code": "warpten",
+        "description": "快速建造和训练",
+        "category": "建造",
+        "enabled": true
+      },
+      {
+        "id": "wc3_synergy",
+        "game": 1,
+        "code": "synergy",
+        "description": "关闭科技树需求",
+        "category": "建造",
+        "enabled": true
+      }
+    ],
+    "starcraft": [
+      {
+        "id": "sc_showmethemoney",
+        "game": 2,
+        "code": "show me the money",
+        "description": "获得10000水晶和瓦斯",
+        "category": "资源",
+        "enabled": true
+      },
+      {
+        "id": "sc_blacksheepwall",
+        "game": 2,
+        "code": "black sheep wall",
+        "description": "显示全图",
+        "category": "地图",
+        "enabled": true
+      },
+      {
+        "id": "sc_poweroverwhelming",
+        "game": 2,
+        "code": "power overwhelming",
+        "description": "无敌模式",
+        "category": "战斗",
+        "enabled": true
+      },
+      {
+        "id": "sc_operationcwal",
+        "game": 2,
+        "code": "operation cwal",
+        "description": "快速建造",
+        "category": "建造",
+        "enabled": true
+      },
+      {
+        "id": "sc_thegathering",
+        "game": 2,
+        "code": "the gathering",
+        "description": "技能无限能量",
+        "category": "战斗",
+        "enabled": true
+      },
+      {
+        "id": "sc_gameoverman",
+        "game": 2,
+        "code": "game over man",
+        "description": "任务失败",
+        "category": "游戏",
+        "enabled": true
+      },
+      {
+        "id": "sc_stayingalive",
+        "game": 2,
+        "code": "staying alive",
+        "description": "继续游戏（失败后继续）",
+        "category": "游戏",
+        "enabled": true
+      },
+      {
+        "id": "sc_thereisnoc owlevel",
+        "game": 2,
+        "code": "there is no cow level",
+        "description": "任务胜利",
+        "category": "游戏",
+        "enabled": true
+      },
+      {
+        "id": "sc_whatsmine",
+        "game": 2,
+        "code": "whats mine is mine",
+        "description": "获得500水晶",
+        "category": "资源",
+        "enabled": true
+      },
+      {
+        "id": "sc_breathedeep",
+        "game": 2,
+        "code": "breathe deep",
+        "description": "获得500瓦斯",
+        "category": "资源",
+        "enabled": true
+      },
+      {
+        "id": "sc_somethingfornothing",
+        "game": 2,
+        "code": "something for nothing",
+        "description": "所有科技升级",
+        "category": "科技",
+        "enabled": true
+      },
+      {
+        "id": "sc_medievalman",
+        "game": 2,
+        "code": "medieval man",
+        "description": "单位免费升级",
+        "category": "科技",
+        "enabled": true
+      },
+      {
+        "id": "sc_modifythephasevariance",
+        "game": 2,
+        "code": "modify the phase variance",
+        "description": "可以建造所有建筑",
+        "category": "建造",
+        "enabled": true
+      },
+      {
+        "id": "sc_foodforthought",
+        "game": 2,
+        "code": "food for thought",
+        "description": "取消人口限制",
+        "category": "资源",
+        "enabled": true
+      }
+    ]
+  }
+}

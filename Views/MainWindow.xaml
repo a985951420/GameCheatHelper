@@ -1,0 +1,149 @@
+<Window x:Class="GameCheatHelper.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="GameCheatHelper - 游戏秘籍助手"
+        Height="600"
+        Width="800"
+        MinHeight="500"
+        MinWidth="700"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="{StaticResource DefaultFont}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 顶部状态栏 -->
+        <Border Grid.Row="0"
+                Background="{StaticResource PrimaryBrush}"
+                Padding="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="🎮 当前游戏: "
+                               Foreground="White"
+                               FontSize="14"
+                               VerticalAlignment="Center"/>
+                    <TextBlock x:Name="GameStatusText"
+                               Text="未检测到游戏"
+                               Foreground="White"
+                               FontSize="14"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <Button Grid.Column="1"
+                        Content="⚙ 设置"
+                        Background="Transparent"
+                        Foreground="White"
+                        BorderThickness="1"
+                        BorderBrush="White"
+                        Padding="10,5"
+                        Cursor="Hand"
+                        Click="SettingsButton_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- 主内容区 -->
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- 搜索栏 -->
+            <Border Grid.Row="0"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1"
+                    Padding="10"
+                    Margin="0,0,0,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox x:Name="SearchTextBox"
+                             Grid.Column="0"
+                             Padding="5"
+                             FontSize="13"
+                             VerticalAlignment="Center"/>
+
+                    <Button Grid.Column="1"
+                            Content="🔍 搜索"
+                            Margin="10,0,0,0"
+                            Padding="15,5"
+                            Click="SearchButton_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- 秘籍列表 -->
+            <Border Grid.Row="1"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1">
+                <DataGrid x:Name="CheatDataGrid"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          SelectionMode="Single"
+                          GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column"
+                          AlternatingRowBackground="#F5F5F5">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="热键" Binding="{Binding HotKeyText}" Width="80" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="秘籍代码" Binding="{Binding Code}" Width="200" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="描述" Binding="{Binding Description}" Width="*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="分类" Binding="{Binding Category}" Width="100" IsReadOnly="True"/>
+                        <DataGridCheckBoxColumn Header="启用" Binding="{Binding Enabled}" Width="60"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <!-- 操作按钮 -->
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        Margin="0,10,0,0">
+                <Button Content="➕ 添加秘籍"
+                        Padding="10,5"
+                        Margin="0,0,10,0"
+                        Click="AddCheatButton_Click"/>
+                <Button Content="✏ 编辑"
+                        Padding="10,5"
+                        Margin="0,0,10,0"
+                        Click="EditCheatButton_Click"/>
+                <Button Content="🗑 删除"
+                        Padding="10,5"
+                        Click="DeleteCheatButton_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- 底部状态栏 -->
+        <Border Grid.Row="2"
+                Background="#F5F5F5"
+                BorderBrush="#E0E0E0"
+                BorderThickness="0,1,0,0"
+                Padding="10,5">
+            <Grid>
+                <TextBlock x:Name="StatusText"
+                           Text="就绪"
+                           VerticalAlignment="Center"/>
+                <TextBlock Text="v1.0.0"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Foreground="#757575"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
