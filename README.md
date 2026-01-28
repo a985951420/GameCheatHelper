@@ -29,7 +29,7 @@ GameCheatHelper 是一个基于 C# 和 Windows API 的桌面应用程序，用�
 ## 系统要求
 
 - Windows 10 (1809+) 或 Windows 11
-- .NET 6.0 Runtime 或更高版本
+- .NET 8.0 Runtime 或更高版本
 - 管理员权限（用于全局热键）
 
 ## 快速开始

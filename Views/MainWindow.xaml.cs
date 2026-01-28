@@ -1,4 +1,7 @@
+using System;
 using System.Windows;
+using System.Windows.Interop;
+using GameCheatHelper.ViewModels;
 using NLog;
 
 namespace GameCheatHelper.Views
@@ -9,35 +12,36 @@ namespace GameCheatHelper.Views
     public partial class MainWindow : Window
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private MainViewModel? _viewModel;
 
         public MainWindow()
         {
             InitializeComponent();
             Logger.Info("主窗口初始化");
 
-            // 加载数据
-            LoadData();
-
-            // 设置状态
-            UpdateStatus("应用程序已启动，等待检测游戏...");
+            // 窗口加载完成后初始化 ViewModel
+            Loaded += MainWindow_Loaded;
         }
 
-        /// <summary>
-        /// 加载秘籍数据
-        /// </summary>
-        private void LoadData()
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // TODO: 从服务加载秘籍数据
-            Logger.Debug("加载秘籍数据");
-        }
+            try
+            {
+                // 获取窗口句柄
+                var windowHelper = new WindowInteropHelper(this);
+                var windowHandle = windowHelper.Handle;
 
-        /// <summary>
-        /// 更新状态文本
-        /// </summary>
-        private void UpdateStatus(string message)
-        {
-            StatusText.Text = message;
-            Logger.Info($"状态: {message}");
+                // 创建 ViewModel 并设置为 DataContext
+                _viewModel = new MainViewModel(windowHandle);
+                DataContext = _viewModel;
+
+                Logger.Info("ViewModel 初始化成功");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "ViewModel 初始化失败");
+                MessageBox.Show($"初始化失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         /// <summary>
@@ -56,11 +60,14 @@ namespace GameCheatHelper.Views
             var searchText = SearchTextBox.Text;
             if (string.IsNullOrWhiteSpace(searchText))
             {
-                UpdateStatus("请输入搜索关键词");
+                if (_viewModel != null)
+                    _viewModel.StatusMessage = "请输入搜索关键词";
                 return;
             }
 
-            UpdateStatus($"搜索: {searchText}");
+            if (_viewModel != null)
+                _viewModel.StatusMessage = $"搜索: {searchText}";
+
             // TODO: 实现搜索功能
         }
 
@@ -106,13 +113,15 @@ namespace GameCheatHelper.Views
             if (result == MessageBoxResult.Yes)
             {
                 // TODO: 实现删除功能
-                UpdateStatus("秘籍已删除");
+                if (_viewModel != null)
+                    _viewModel.StatusMessage = "秘籍已删除";
             }
         }
 
-        protected override void OnClosed(System.EventArgs e)
+        protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
+            _viewModel?.Dispose();
             Logger.Info("主窗口关闭");
         }
     }

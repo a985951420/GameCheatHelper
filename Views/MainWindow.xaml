@@ -34,8 +34,7 @@
                                Foreground="White"
                                FontSize="14"
                                VerticalAlignment="Center"/>
-                    <TextBlock x:Name="GameStatusText"
-                               Text="未检测到游戏"
+                    <TextBlock Text="{Binding GameStatus}"
                                Foreground="White"
                                FontSize="14"
                                FontWeight="Bold"
@@ -93,6 +92,7 @@
                     BorderBrush="#E0E0E0"
                     BorderThickness="1">
                 <DataGrid x:Name="CheatDataGrid"
+                          ItemsSource="{Binding CheatCodes}"
                           AutoGenerateColumns="False"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False"
@@ -136,8 +136,7 @@
                 BorderThickness="0,1,0,0"
                 Padding="10,5">
             <Grid>
-                <TextBlock x:Name="StatusText"
-                           Text="就绪"
+                <TextBlock Text="{Binding StatusMessage}"
                            VerticalAlignment="Center"/>
                 <TextBlock Text="v1.0.0"
                            HorizontalAlignment="Right"
