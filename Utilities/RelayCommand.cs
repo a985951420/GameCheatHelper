@@ -66,4 +66,55 @@ namespace GameCheatHelper.Utilities
             CommandManager.InvalidateRequerySuggested();
         }
     }
+
+    /// <summary>
+    /// 泛型命令实现
+    /// </summary>
+    public class RelayCommand<T> : ICommand
+    {
+        private readonly Action<T?> _execute;
+        private readonly Predicate<T?>? _canExecute;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public RelayCommand(Action<T?> execute, Predicate<T?>? canExecute = null)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        /// <summary>
+        /// 判断命令是否可以执行
+        /// </summary>
+        public bool CanExecute(object? parameter)
+        {
+            return _canExecute?.Invoke((T?)parameter) ?? true;
+        }
+
+        /// <summary>
+        /// 执行命令
+        /// </summary>
+        public void Execute(object? parameter)
+        {
+            _execute((T?)parameter);
+        }
+
+        /// <summary>
+        /// 当命令的可执行状态发生变化时触发
+        /// </summary>
+        public event EventHandler? CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
+
+        /// <summary>
+        /// 手动触发 CanExecuteChanged 事件
+        /// </summary>
+        public void RaiseCanExecuteChanged()
+        {
+            CommandManager.InvalidateRequerySuggested();
+        }
+    }
 }

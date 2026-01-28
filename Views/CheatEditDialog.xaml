@@ -1,0 +1,130 @@
+<Window x:Class="GameCheatHelper.Views.CheatEditDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="{Binding WindowTitle}"
+        Height="450"
+        Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        FontFamily="{StaticResource DefaultFont}">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 游戏选择 -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,15">
+            <TextBlock Text="游戏类型" FontWeight="Bold" Margin="0,0,0,5"/>
+            <ComboBox x:Name="GameTypeComboBox"
+                      ItemsSource="{Binding GameTypes}"
+                      SelectedItem="{Binding SelectedGameType}"
+                      DisplayMemberPath="Value"
+                      SelectedValuePath="Key"
+                      Height="30"
+                      FontSize="13"/>
+        </StackPanel>
+
+        <!-- 秘籍代码 -->
+        <StackPanel Grid.Row="1" Margin="0,0,0,15">
+            <TextBlock Text="秘籍代码 *" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBox Text="{Binding CheatCode, UpdateSourceTrigger=PropertyChanged}"
+                     Height="30"
+                     FontSize="13"
+                     Padding="5"/>
+            <TextBlock Text="示例: greedisgood 或 show me the money"
+                       Foreground="#757575"
+                       FontSize="11"
+                       Margin="0,3,0,0"/>
+        </StackPanel>
+
+        <!-- 描述 -->
+        <StackPanel Grid.Row="2" Margin="0,0,0,15">
+            <TextBlock Text="描述 *" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBox Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                     Height="30"
+                     FontSize="13"
+                     Padding="5"/>
+            <TextBlock Text="简要说明该秘籍的作用"
+                       Foreground="#757575"
+                       FontSize="11"
+                       Margin="0,3,0,0"/>
+        </StackPanel>
+
+        <!-- 分类 -->
+        <StackPanel Grid.Row="3" Margin="0,0,0,15">
+            <TextBlock Text="分类" FontWeight="Bold" Margin="0,0,0,5"/>
+            <ComboBox x:Name="CategoryComboBox"
+                      ItemsSource="{Binding Categories}"
+                      SelectedItem="{Binding SelectedCategory}"
+                      IsEditable="True"
+                      Height="30"
+                      FontSize="13"/>
+        </StackPanel>
+
+        <!-- 启用状态 -->
+        <StackPanel Grid.Row="4" Margin="0,0,0,15">
+            <CheckBox Content="启用该秘籍"
+                      IsChecked="{Binding IsEnabled}"
+                      FontWeight="Bold"
+                      VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- 热键设置说明 -->
+        <Border Grid.Row="5"
+                Background="#E3F2FD"
+                BorderBrush="{StaticResource PrimaryBrush}"
+                BorderThickness="1"
+                Padding="10"
+                Margin="0,0,0,15">
+            <StackPanel>
+                <TextBlock Text="💡 热键绑定说明" FontWeight="Bold" Margin="0,0,0,5"/>
+                <TextBlock TextWrapping="Wrap" FontSize="12">
+                    秘籍的热键需要在 Data\DefaultHotKeys.json 文件中配置。
+                    保存后重启应用程序使配置生效。
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <!-- 验证消息 -->
+        <TextBlock Grid.Row="6"
+                   Text="{Binding ValidationMessage}"
+                   Foreground="{StaticResource ErrorBrush}"
+                   FontSize="12"
+                   TextWrapping="Wrap"
+                   Margin="0,0,0,10"
+                   VerticalAlignment="Top"/>
+
+        <!-- 按钮 -->
+        <StackPanel Grid.Row="7"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button Content="保存"
+                    Click="SaveButton_Click"
+                    Width="80"
+                    Height="32"
+                    Margin="0,0,10,0"
+                    Background="{StaticResource PrimaryBrush}"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Cursor="Hand"/>
+            <Button Content="取消"
+                    Click="CancelButton_Click"
+                    Width="80"
+                    Height="32"
+                    Background="#E0E0E0"
+                    BorderThickness="0"
+                    Cursor="Hand"/>
+        </StackPanel>
+    </Grid>
+</Window>

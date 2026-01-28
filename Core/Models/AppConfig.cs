@@ -44,9 +44,19 @@ namespace GameCheatHelper.Core.Models
         public bool StartWithWindows { get; set; } = false;
 
         /// <summary>
+        /// 启动时最小化到托盘
+        /// </summary>
+        public bool StartMinimized { get; set; } = false;
+
+        /// <summary>
         /// 最小化到系统托盘
         /// </summary>
         public bool MinimizeToTray { get; set; } = true;
+
+        /// <summary>
+        /// 关闭窗口时最小化到托盘
+        /// </summary>
+        public bool CloseToTray { get; set; } = false;
 
         /// <summary>
         /// 显示通知

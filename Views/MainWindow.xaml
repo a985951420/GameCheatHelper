@@ -93,6 +93,7 @@
                     BorderThickness="1">
                 <DataGrid x:Name="CheatDataGrid"
                           ItemsSource="{Binding CheatCodes}"
+                          SelectedItem="{Binding SelectedCheat}"
                           AutoGenerateColumns="False"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False"

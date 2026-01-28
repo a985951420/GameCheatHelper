@@ -49,7 +49,16 @@ namespace GameCheatHelper.Views
         /// </summary>
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("设置功能即将推出！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (_viewModel == null) return;
+
+            var settingsViewModel = new SettingsViewModel(_viewModel.GetConfigService());
+            var settingsWindow = new SettingsWindow(settingsViewModel);
+            settingsWindow.Owner = this;
+
+            if (settingsWindow.ShowDialog() == true)
+            {
+                _viewModel.StatusMessage = "设置已更新，部分设置需要重启应用生效";
+            }
         }
 
         /// <summary>
@@ -58,17 +67,7 @@ namespace GameCheatHelper.Views
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
             var searchText = SearchTextBox.Text;
-            if (string.IsNullOrWhiteSpace(searchText))
-            {
-                if (_viewModel != null)
-                    _viewModel.StatusMessage = "请输入搜索关键词";
-                return;
-            }
-
-            if (_viewModel != null)
-                _viewModel.StatusMessage = $"搜索: {searchText}";
-
-            // TODO: 实现搜索功能
+            _viewModel?.SearchCommand.Execute(searchText);
         }
 
         /// <summary>
@@ -76,7 +75,7 @@ namespace GameCheatHelper.Views
         /// </summary>
         private void AddCheatButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("添加秘籍功能即将推出！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            _viewModel?.AddCheatCommand.Execute(null);
         }
 
         /// <summary>
@@ -84,13 +83,7 @@ namespace GameCheatHelper.Views
         /// </summary>
         private void EditCheatButton_Click(object sender, RoutedEventArgs e)
         {
-            if (CheatDataGrid.SelectedItem == null)
-            {
-                MessageBox.Show("请先选择要编辑的秘籍", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            MessageBox.Show("编辑秘籍功能即将推出！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            _viewModel?.EditCheatCommand.Execute(null);
         }
 
         /// <summary>
@@ -98,24 +91,7 @@ namespace GameCheatHelper.Views
         /// </summary>
         private void DeleteCheatButton_Click(object sender, RoutedEventArgs e)
         {
-            if (CheatDataGrid.SelectedItem == null)
-            {
-                MessageBox.Show("请先选择要删除的秘籍", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            var result = MessageBox.Show(
-                "确定要删除选中的秘籍吗？",
-                "确认删除",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                // TODO: 实现删除功能
-                if (_viewModel != null)
-                    _viewModel.StatusMessage = "秘籍已删除";
-            }
+            _viewModel?.DeleteCheatCommand.Execute(null);
         }
 
         protected override void OnClosed(EventArgs e)

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(dir:*)",
       "Bash(dotnet build:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(findstr:*)"
     ]
   }
 }
