@@ -40,6 +40,72 @@ namespace GameCheatHelper.Utilities
         [DllImport("user32.dll")]
         public static extern IntPtr GetForegroundWindow();
 
+        /// <summary>
+        /// 获取窗口矩形区域
+        /// </summary>
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        /// <summary>
+        /// 获取窗口位置信息
+        /// </summary>
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetWindowPlacement(IntPtr hWnd, ref WINDOWPLACEMENT lpwndpl);
+
+        /// <summary>
+        /// 检测窗口是否最小化
+        /// </summary>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool IsIconic(IntPtr hWnd);
+
+        /// <summary>
+        /// 显示窗口
+        /// </summary>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        /// <summary>
+        /// 获取窗口所在的显示器
+        /// </summary>
+        [DllImport("user32.dll")]
+        public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
+
+        /// <summary>
+        /// 获取显示器信息
+        /// </summary>
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+
+        /// <summary>
+        /// 附加线程输入处理（用于增强窗口激活）
+        /// </summary>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
+
+        /// <summary>
+        /// 获取窗口所属线程ID和进程ID
+        /// </summary>
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+        /// <summary>
+        /// 获取当前线程ID
+        /// </summary>
+        [DllImport("kernel32.dll")]
+        public static extern uint GetCurrentThreadId();
+
+        /// <summary>
+        /// 模拟键盘按键（备选输入方式）
+        /// </summary>
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
         #endregion
 
         #region 热键管理相关
@@ -91,6 +157,18 @@ namespace GameCheatHelper.Utilities
         public const ushort VK_SHIFT = 0x10;
         public const ushort VK_CONTROL = 0x11;
         public const ushort VK_MENU = 0x12;  // Alt key
+
+        // ShowWindow 常量
+        public const int SW_RESTORE = 9;
+        public const int SW_SHOW = 5;
+        public const int SW_SHOWNORMAL = 1;
+
+        // MonitorFromWindow 标志
+        public const uint MONITOR_DEFAULTTONEAREST = 2;
+
+        // GetWindowPlacement 常量
+        public const uint WPF_RESTORETOMAXIMIZED = 0x0002;
+        public const int SW_SHOWMAXIMIZED = 3;
 
         #endregion
 
@@ -158,6 +236,57 @@ namespace GameCheatHelper.Utilities
             public uint Msg;
             public ushort ParamL;
             public ushort ParamH;
+        }
+
+        /// <summary>
+        /// 矩形结构体
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+
+            public int Width => Right - Left;
+            public int Height => Bottom - Top;
+        }
+
+        /// <summary>
+        /// 窗口位置信息结构体
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WINDOWPLACEMENT
+        {
+            public uint Length;
+            public uint Flags;
+            public uint ShowCmd;
+            public POINT MinPosition;
+            public POINT MaxPosition;
+            public RECT NormalPosition;
+        }
+
+        /// <summary>
+        /// 点结构体
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+        /// <summary>
+        /// 显示器信息结构体
+        /// </summary>
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public struct MONITORINFO
+        {
+            public uint Size;
+            public RECT Monitor;
+            public RECT WorkArea;
+            public uint Flags;
         }
 
         #endregion
