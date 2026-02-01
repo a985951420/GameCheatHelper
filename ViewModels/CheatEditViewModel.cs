@@ -17,6 +17,7 @@ namespace GameCheatHelper.ViewModels
         private bool _isEnabled = true;
         private string _validationMessage = string.Empty;
         private bool _isNewCheat;
+        private HotKey? _currentHotKey;
 
         /// <summary>
         /// 窗口标题
@@ -32,6 +33,15 @@ namespace GameCheatHelper.ViewModels
         /// 分类列表
         /// </summary>
         public List<string> Categories { get; }
+
+        /// <summary>
+        /// 当前热键
+        /// </summary>
+        public HotKey? CurrentHotKey
+        {
+            get => _currentHotKey;
+            set => SetProperty(ref _currentHotKey, value);
+        }
 
         /// <summary>
         /// 秘籍代码
@@ -136,6 +146,10 @@ namespace GameCheatHelper.ViewModels
 
             // 保存原始秘籍引用
             ResultCheat = cheat;
+
+            // 加载热键（如果有的话）
+            // 注意：这里暂时不加载，因为需要从 HotKeyBindingService 获取
+            // 在调用代码中应该设置 CurrentHotKey
         }
 
         /// <summary>

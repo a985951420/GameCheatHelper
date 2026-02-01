@@ -1,0 +1,35 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameCheatHelper", "GameCheatHelper.csproj", "{628218BC-3BAF-C87F-AB6F-E70B458B10E5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameCheatHelper.Tests", "Tests\GameCheatHelper.Tests.csproj", "{351B787B-D3CC-917E-AC39-BE26E175DB0C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{628218BC-3BAF-C87F-AB6F-E70B458B10E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{628218BC-3BAF-C87F-AB6F-E70B458B10E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{628218BC-3BAF-C87F-AB6F-E70B458B10E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{628218BC-3BAF-C87F-AB6F-E70B458B10E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{351B787B-D3CC-917E-AC39-BE26E175DB0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{351B787B-D3CC-917E-AC39-BE26E175DB0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{351B787B-D3CC-917E-AC39-BE26E175DB0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{351B787B-D3CC-917E-AC39-BE26E175DB0C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{351B787B-D3CC-917E-AC39-BE26E175DB0C} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7B18262B-8882-473B-8153-C2B6531F547D}
+	EndGlobalSection
+EndGlobal

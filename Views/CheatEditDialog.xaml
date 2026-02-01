@@ -80,21 +80,31 @@
                       VerticalAlignment="Center"/>
         </StackPanel>
 
-        <!-- 热键设置说明 -->
-        <Border Grid.Row="5"
-                Background="#E3F2FD"
-                BorderBrush="{StaticResource PrimaryBrush}"
-                BorderThickness="1"
-                Padding="10"
-                Margin="0,0,0,15">
-            <StackPanel>
-                <TextBlock Text="💡 热键绑定说明" FontWeight="Bold" Margin="0,0,0,5"/>
-                <TextBlock TextWrapping="Wrap" FontSize="12">
-                    秘籍的热键需要在 Data\DefaultHotKeys.json 文件中配置。
-                    保存后重启应用程序使配置生效。
-                </TextBlock>
-            </StackPanel>
-        </Border>
+        <!-- 热键配置 -->
+        <StackPanel Grid.Row="5" Margin="0,0,0,15">
+            <TextBlock Text="快捷键" FontWeight="Bold" Margin="0,0,0,5"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 热键录制控件 -->
+                <Border Grid.Column="0" x:Name="HotKeyRecorderPlaceholder"/>
+
+                <!-- 提示文本 -->
+                <TextBlock Grid.Column="1"
+                           Text="💡"
+                           FontSize="16"
+                           VerticalAlignment="Center"
+                           Margin="8,0,0,0"
+                           ToolTip="点击输入框后按下组合键即可录制&#x0a;支持 Ctrl、Alt、Shift、Win 修饰键"/>
+            </Grid>
+            <TextBlock Text="点击输入框后按下组合键（如 Ctrl+Alt+F1）"
+                       Foreground="#757575"
+                       FontSize="11"
+                       Margin="0,3,0,0"/>
+        </StackPanel>
 
         <!-- 验证消息 -->
         <TextBlock Grid.Row="6"

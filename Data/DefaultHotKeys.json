@@ -3,70 +3,70 @@
     "id": 1,
     "cheatCodeId": "wc3_greedisgood",
     "key": "F1",
-    "modifiers": 0,
+    "modifiers": 2,
     "description": "魔兽3: greedisgood"
   },
   {
     "id": 2,
     "cheatCodeId": "wc3_iseedeadpeople",
     "key": "F2",
-    "modifiers": 0,
+    "modifiers": 3,
     "description": "魔兽3: iseedeadpeople"
   },
   {
     "id": 3,
     "cheatCodeId": "wc3_whosyourdaddy",
     "key": "F3",
-    "modifiers": 0,
+    "modifiers": 1,
     "description": "魔兽3: whosyourdaddy"
   },
   {
     "id": 4,
     "cheatCodeId": "wc3_thereisnospoon",
     "key": "F4",
-    "modifiers": 0,
+    "modifiers": 4,
     "description": "魔兽3: thereisnospoon"
   },
   {
     "id": 5,
     "cheatCodeId": "wc3_warpten",
     "key": "F5",
-    "modifiers": 0,
+    "modifiers": 6,
     "description": "魔兽3: warpten"
   },
   {
     "id": 6,
     "cheatCodeId": "sc_showmethemoney",
     "key": "F1",
-    "modifiers": 0,
+    "modifiers": 2,
     "description": "星际1: show me the money"
   },
   {
     "id": 7,
     "cheatCodeId": "sc_blacksheepwall",
     "key": "F2",
-    "modifiers": 0,
+    "modifiers": 3,
     "description": "星际1: black sheep wall"
   },
   {
     "id": 8,
     "cheatCodeId": "sc_poweroverwhelming",
     "key": "F3",
-    "modifiers": 0,
+    "modifiers": 1,
     "description": "星际1: power overwhelming"
   },
   {
     "id": 9,
     "cheatCodeId": "sc_operationcwal",
     "key": "F4",
-    "modifiers": 0,
+    "modifiers": 4,
     "description": "星际1: operation cwal"
   },
   {
     "id": 10,
     "cheatCodeId": "sc_thegathering",
     "key": "F5",
-    "modifiers": 0,
+    "modifiers": 6,
     "description": "星际1: the gathering"
   }
 ]

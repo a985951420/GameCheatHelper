@@ -1,0 +1,64 @@
+<UserControl x:Class="GameCheatHelper.Controls.HotKeyRecorder"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="40" d:DesignWidth="300">
+    <Border BorderBrush="#CCCCCC"
+            BorderThickness="1"
+            CornerRadius="3"
+            Background="White">
+        <Grid>
+            <TextBox x:Name="HotKeyTextBox"
+                     Text="{Binding HotKeyText, Mode=OneWay}"
+                     IsReadOnly="True"
+                     BorderThickness="0"
+                     Background="Transparent"
+                     Padding="8,6"
+                     FontSize="13"
+                     VerticalContentAlignment="Center"
+                     PreviewKeyDown="HotKeyTextBox_PreviewKeyDown"
+                     GotFocus="HotKeyTextBox_GotFocus"
+                     LostFocus="HotKeyTextBox_LostFocus"
+                     Cursor="Hand">
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                <Setter Property="Background" Value="#E3F2FD"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+
+            <!-- 清除按钮 -->
+            <Button x:Name="ClearButton"
+                    Content="✕"
+                    Width="24"
+                    Height="24"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,4,0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    Foreground="#757575"
+                    Cursor="Hand"
+                    Click="ClearButton_Click"
+                    ToolTip="清除热键">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasHotKey}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+    </Border>
+</UserControl>

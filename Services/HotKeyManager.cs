@@ -161,6 +161,38 @@ namespace GameCheatHelper.Services
         }
 
         /// <summary>
+        /// 检查热键是否与已注册的热键冲突（公共方法）
+        /// </summary>
+        /// <param name="hotKey">要检查的热键</param>
+        /// <param name="excludeCheatCodeId">排除的秘籍ID（编辑时使用）</param>
+        /// <returns>如果冲突返回true，否则返回false</returns>
+        public bool CheckHotKeyConflict(HotKey hotKey, string? excludeCheatCodeId = null)
+        {
+            foreach (var registeredHotKey in _registeredHotKeys.Values)
+            {
+                // 如果是同一个秘籍的热键，则跳过
+                if (excludeCheatCodeId != null && registeredHotKey.CheatCodeId == excludeCheatCodeId)
+                {
+                    continue;
+                }
+
+                if (registeredHotKey.IsSameAs(hotKey))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 获取所有已注册的热键
+        /// </summary>
+        public IReadOnlyCollection<HotKey> GetRegisteredHotKeys()
+        {
+            return _registeredHotKeys.Values;
+        }
+
+        /// <summary>
         /// 窗口消息处理
         /// </summary>
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

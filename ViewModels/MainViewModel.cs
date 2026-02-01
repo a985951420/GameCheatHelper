@@ -298,6 +298,21 @@ namespace GameCheatHelper.ViewModels
                 var newCheat = viewModel.GetCheatCode();
                 if (_cheatCodeService.AddCheat(newCheat))
                 {
+                    // 保存热键绑定
+                    if (viewModel.CurrentHotKey != null)
+                    {
+                        var description = $"{GetGameName(newCheat.Game)}: {newCheat.Description}";
+                        _hotKeyBindingService.AddOrUpdateHotKeyBinding(newCheat.Id, viewModel.CurrentHotKey, description);
+
+                        // 如果当前游戏正在运行，注册热键
+                        if (_currentGame != null && newCheat.Game == _currentGame.GameType && _hotKeyManager != null)
+                        {
+                            var hotKey = viewModel.CurrentHotKey;
+                            hotKey.CheatCodeId = newCheat.Id;
+                            _hotKeyManager.RegisterHotKey(hotKey);
+                        }
+                    }
+
                     StatusMessage = $"秘籍 '{newCheat.Code}' 已添加";
 
                     // 如果是当前游戏，刷新列表
@@ -338,6 +353,14 @@ namespace GameCheatHelper.ViewModels
             }
 
             var viewModel = new CheatEditViewModel(cheat);
+
+            // 加载现有热键绑定
+            var existingBinding = _hotKeyBindingService.GetBindingByCheatCodeId(cheat.Id);
+            if (existingBinding != null)
+            {
+                viewModel.CurrentHotKey = existingBinding.HotKey;
+            }
+
             var dialog = new Views.CheatEditDialog(viewModel);
             dialog.Owner = System.Windows.Application.Current.MainWindow;
 
@@ -346,6 +369,18 @@ namespace GameCheatHelper.ViewModels
                 var updatedCheat = viewModel.GetCheatCode();
                 if (_cheatCodeService.UpdateCheat(updatedCheat))
                 {
+                    // 更新热键绑定
+                    var description = $"{GetGameName(updatedCheat.Game)}: {updatedCheat.Description}";
+                    _hotKeyBindingService.AddOrUpdateHotKeyBinding(updatedCheat.Id, viewModel.CurrentHotKey, description);
+
+                    // 如果当前游戏正在运行，需要重新注册热键
+                    if (_currentGame != null && updatedCheat.Game == _currentGame.GameType)
+                    {
+                        // 注销所有热键并重新注册
+                        _hotKeyManager?.UnregisterAllHotKeys();
+                        RegisterHotKeysForGame(_currentGame.GameType);
+                    }
+
                     StatusMessage = $"秘籍 '{updatedCheat.Code}' 已更新";
 
                     // 刷新列表
@@ -359,6 +394,19 @@ namespace GameCheatHelper.ViewModels
                     StatusMessage = "更新秘籍失败";
                 }
             }
+        }
+
+        /// <summary>
+        /// 获取游戏名称
+        /// </summary>
+        private string GetGameName(GameType gameType)
+        {
+            return gameType switch
+            {
+                GameType.Warcraft3 => "魔兽争霸3",
+                GameType.StarCraft => "星际争霸1",
+                _ => "未知游戏"
+            };
         }
 
         /// <summary>

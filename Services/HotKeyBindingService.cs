@@ -141,6 +141,130 @@ namespace GameCheatHelper.Services
         }
 
         /// <summary>
+        /// 保存热键绑定到文件
+        /// </summary>
+        public bool SaveHotKeyBindings()
+        {
+            try
+            {
+                var dtoList = _hotKeyBindings.Select(b => new HotKeyBindingDto
+                {
+                    Id = b.Id,
+                    CheatCodeId = b.CheatCodeId,
+                    Key = b.HotKey.Key.ToString(),
+                    Modifiers = b.HotKey.Modifiers,
+                    Description = b.Description
+                }).ToList();
+
+                var json = JsonConvert.SerializeObject(dtoList, Formatting.Indented);
+
+                // 确保目录存在
+                var directory = Path.GetDirectoryName(_defaultHotKeysPath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                File.WriteAllText(_defaultHotKeysPath, json);
+                Logger.Info($"热键绑定已保存到: {_defaultHotKeysPath}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "保存热键绑定失败");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 添加或更新热键绑定
+        /// </summary>
+        /// <param name="cheatCodeId">秘籍ID</param>
+        /// <param name="hotKey">热键（null表示移除热键）</param>
+        /// <param name="description">描述</param>
+        public bool AddOrUpdateHotKeyBinding(string cheatCodeId, HotKey? hotKey, string description)
+        {
+            try
+            {
+                // 查找现有绑定
+                var existingBinding = _hotKeyBindings.FirstOrDefault(b => b.CheatCodeId == cheatCodeId);
+
+                if (hotKey == null)
+                {
+                    // 移除热键绑定
+                    if (existingBinding != null)
+                    {
+                        _hotKeyBindings.Remove(existingBinding);
+                        Logger.Info($"移除秘籍 {cheatCodeId} 的热键绑定");
+                    }
+                }
+                else
+                {
+                    if (existingBinding != null)
+                    {
+                        // 更新现有绑定
+                        existingBinding.HotKey = hotKey;
+                        existingBinding.Description = description;
+                        Logger.Info($"更新秘籍 {cheatCodeId} 的热键为: {hotKey.DisplayText}");
+                    }
+                    else
+                    {
+                        // 添加新绑定
+                        var newId = _hotKeyBindings.Any() ? _hotKeyBindings.Max(b => b.Id) + 1 : 1;
+                        var binding = new HotKeyBinding
+                        {
+                            Id = newId,
+                            CheatCodeId = cheatCodeId,
+                            HotKey = hotKey,
+                            Description = description
+                        };
+                        _hotKeyBindings.Add(binding);
+                        Logger.Info($"添加秘籍 {cheatCodeId} 的热键绑定: {hotKey.DisplayText}");
+                    }
+                }
+
+                // 保存到文件
+                return SaveHotKeyBindings();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "添加或更新热键绑定失败");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 根据秘籍ID获取热键绑定
+        /// </summary>
+        public HotKeyBinding? GetBindingByCheatCodeId(string cheatCodeId)
+        {
+            return _hotKeyBindings.FirstOrDefault(b => b.CheatCodeId == cheatCodeId);
+        }
+
+        /// <summary>
+        /// 检查热键是否被占用
+        /// </summary>
+        /// <param name="hotKey">要检查的热键</param>
+        /// <param name="excludeCheatCodeId">排除的秘籍ID（编辑时使用）</param>
+        /// <returns>占用该热键的秘籍ID，如果未被占用返回null</returns>
+        public string? CheckHotKeyOccupied(HotKey hotKey, string? excludeCheatCodeId = null)
+        {
+            foreach (var binding in _hotKeyBindings)
+            {
+                if (excludeCheatCodeId != null && binding.CheatCodeId == excludeCheatCodeId)
+                {
+                    continue;
+                }
+
+                if (binding.HotKey.IsSameAs(hotKey))
+                {
+                    return binding.CheatCodeId;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// DTO 类用于 JSON 反序列化
         /// </summary>
         private class HotKeyBindingDto
