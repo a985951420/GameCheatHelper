@@ -78,7 +78,7 @@ namespace GameCheatHelper.Services
                 {
                     hotKey.Id = id;
                     _registeredHotKeys[id] = hotKey;
-                    Logger.Info($"热键注册成功: {hotKey.DisplayText} (ID: {id})");
+                    Logger.Info($"热键注册成功: {hotKey.DisplayText} (ID: {id}), CheatCodeId: {hotKey.CheatCodeId ?? "null"}");
                     return true;
                 }
                 else
@@ -203,7 +203,7 @@ namespace GameCheatHelper.Services
 
                 if (_registeredHotKeys.TryGetValue(id, out var hotKey))
                 {
-                    Logger.Debug($"热键触发: {hotKey.DisplayText}");
+                    Logger.Debug($"热键触发: {hotKey.DisplayText}, CheatCodeId: {hotKey.CheatCodeId ?? "null"}");
                     HotKeyPressed?.Invoke(this, hotKey);
                     handled = true;
                 }

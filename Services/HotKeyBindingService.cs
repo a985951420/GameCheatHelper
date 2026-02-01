@@ -17,46 +17,70 @@ namespace GameCheatHelper.Services
     public class HotKeyBindingService
     {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private readonly string _defaultHotKeysPath;
-        private List<HotKeyBinding> _hotKeyBindings;
+        private readonly string _dataDirectory;
+        private Dictionary<GameType, List<HotKeyBinding>> _hotKeyBindingsByGame;
 
         /// <summary>
-        /// 所有热键绑定
+        /// 所有热键绑定（已废弃，使用 GetBindingsByGameType）
         /// </summary>
-        public IReadOnlyList<HotKeyBinding> HotKeyBindings => _hotKeyBindings.AsReadOnly();
+        [Obsolete("使用 GetBindingsByGameType 代替")]
+        public IReadOnlyList<HotKeyBinding> HotKeyBindings =>
+            _hotKeyBindingsByGame.Values.SelectMany(x => x).ToList().AsReadOnly();
 
         public HotKeyBindingService()
         {
-            _hotKeyBindings = new List<HotKeyBinding>();
-            _defaultHotKeysPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "DefaultHotKeys.json");
+            _hotKeyBindingsByGame = new Dictionary<GameType, List<HotKeyBinding>>();
+            _dataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             Logger.Info("热键绑定服务初始化");
         }
 
         /// <summary>
-        /// 加载默认热键绑定
+        /// 获取游戏类型对应的热键文件路径
         /// </summary>
-        public bool LoadDefaultHotKeyBindings()
+        private string GetHotKeyFilePath(GameType gameType)
+        {
+            var fileName = gameType switch
+            {
+                GameType.Warcraft3 => "Warcraft3_HotKeys.json",
+                GameType.StarCraft => "StarCraft_HotKeys.json",
+                _ => "DefaultHotKeys.json"
+            };
+            return Path.Combine(_dataDirectory, fileName);
+        }
+
+        /// <summary>
+        /// 加载指定游戏类型的热键绑定
+        /// </summary>
+        public bool LoadDefaultHotKeyBindings(GameType gameType)
         {
             try
             {
-                if (!File.Exists(_defaultHotKeysPath))
+                var filePath = GetHotKeyFilePath(gameType);
+
+                if (!File.Exists(filePath))
                 {
-                    Logger.Warn($"默认热键文件不存在: {_defaultHotKeysPath}");
+                    Logger.Warn($"游戏 {gameType} 的热键文件不存在: {filePath}");
                     // 创建默认绑定
-                    CreateDefaultBindings();
+                    CreateDefaultBindings(gameType);
                     return true;
                 }
 
-                var json = File.ReadAllText(_defaultHotKeysPath);
+                var json = File.ReadAllText(filePath);
                 var bindings = JsonConvert.DeserializeObject<List<HotKeyBindingDto>>(json);
 
                 if (bindings == null)
                 {
-                    Logger.Error("解析热键绑定失败");
+                    Logger.Error($"解析游戏 {gameType} 的热键绑定失败");
                     return false;
                 }
 
-                _hotKeyBindings.Clear();
+                // 初始化该游戏的绑定列表
+                if (!_hotKeyBindingsByGame.ContainsKey(gameType))
+                {
+                    _hotKeyBindingsByGame[gameType] = new List<HotKeyBinding>();
+                }
+
+                _hotKeyBindingsByGame[gameType].Clear();
                 foreach (var dto in bindings)
                 {
                     var binding = new HotKeyBinding
@@ -72,15 +96,15 @@ namespace GameCheatHelper.Services
                         },
                         Description = dto.Description
                     };
-                    _hotKeyBindings.Add(binding);
+                    _hotKeyBindingsByGame[gameType].Add(binding);
                 }
 
-                Logger.Info($"成功加载 {_hotKeyBindings.Count} 个热键绑定");
+                Logger.Info($"成功加载游戏 {gameType} 的 {_hotKeyBindingsByGame[gameType].Count} 个热键绑定");
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "加载默认热键绑定失败");
+                Logger.Error(ex, $"加载游戏 {gameType} 的热键绑定失败");
                 return false;
             }
         }
@@ -90,10 +114,20 @@ namespace GameCheatHelper.Services
         /// </summary>
         public List<HotKeyBinding> GetBindingsByGameType(GameType gameType, CheatCodeService cheatCodeService)
         {
+            // 如果该游戏的热键还未加载，先加载
+            if (!_hotKeyBindingsByGame.ContainsKey(gameType))
+            {
+                LoadDefaultHotKeyBindings(gameType);
+            }
+
+            // 获取该游戏的所有秘籍ID
             var cheats = cheatCodeService.GetCheatsByGame(gameType);
             var cheatIds = new HashSet<string>(cheats.Select(c => c.Id));
 
-            return _hotKeyBindings.Where(b => cheatIds.Contains(b.CheatCodeId)).ToList();
+            // 返回该游戏的热键绑定（仅包含有效的秘籍ID）
+            return _hotKeyBindingsByGame.ContainsKey(gameType)
+                ? _hotKeyBindingsByGame[gameType].Where(b => cheatIds.Contains(b.CheatCodeId)).ToList()
+                : new List<HotKeyBinding>();
         }
 
         /// <summary>
@@ -112,42 +146,70 @@ namespace GameCheatHelper.Services
         /// <summary>
         /// 创建默认绑定
         /// </summary>
-        private void CreateDefaultBindings()
+        private void CreateDefaultBindings(GameType gameType)
         {
-            _hotKeyBindings = new List<HotKeyBinding>
+            var bindings = new List<HotKeyBinding>();
+
+            if (gameType == GameType.Warcraft3)
             {
-                new HotKeyBinding
+                bindings = new List<HotKeyBinding>
                 {
-                    Id = 1,
-                    CheatCodeId = "wc3_greedisgood",
-                    HotKey = new HotKey { Id = 1, Key = Key.F1, Modifiers = 0, CheatCodeId = "wc3_greedisgood" },
-                    Description = "魔兽3: greedisgood"
-                },
-                new HotKeyBinding
+                    new HotKeyBinding
+                    {
+                        Id = 1,
+                        CheatCodeId = "wc3_greedisgood",
+                        HotKey = new HotKey { Id = 1, Key = Key.F1, Modifiers = 0, CheatCodeId = "wc3_greedisgood" },
+                        Description = "魔兽3: greedisgood"
+                    },
+                    new HotKeyBinding
+                    {
+                        Id = 2,
+                        CheatCodeId = "wc3_iseedeadpeople",
+                        HotKey = new HotKey { Id = 2, Key = Key.F2, Modifiers = 0, CheatCodeId = "wc3_iseedeadpeople" },
+                        Description = "魔兽3: iseedeadpeople"
+                    },
+                    new HotKeyBinding
+                    {
+                        Id = 3,
+                        CheatCodeId = "wc3_whosyourdaddy",
+                        HotKey = new HotKey { Id = 3, Key = Key.F3, Modifiers = 0, CheatCodeId = "wc3_whosyourdaddy" },
+                        Description = "魔兽3: whosyourdaddy"
+                    }
+                };
+            }
+            else if (gameType == GameType.StarCraft)
+            {
+                bindings = new List<HotKeyBinding>
                 {
-                    Id = 2,
-                    CheatCodeId = "wc3_iseedeadpeople",
-                    HotKey = new HotKey { Id = 2, Key = Key.F2, Modifiers = 0, CheatCodeId = "wc3_iseedeadpeople" },
-                    Description = "魔兽3: iseedeadpeople"
-                },
-                new HotKeyBinding
-                {
-                    Id = 3,
-                    CheatCodeId = "wc3_whosyourdaddy",
-                    HotKey = new HotKey { Id = 3, Key = Key.F3, Modifiers = 0, CheatCodeId = "wc3_whosyourdaddy" },
-                    Description = "魔兽3: whosyourdaddy"
-                }
-            };
+                    new HotKeyBinding
+                    {
+                        Id = 1,
+                        CheatCodeId = "sc_showmethemoney",
+                        HotKey = new HotKey { Id = 1, Key = Key.F1, Modifiers = 0, CheatCodeId = "sc_showmethemoney" },
+                        Description = "星际1: show me the money"
+                    }
+                };
+            }
+
+            _hotKeyBindingsByGame[gameType] = bindings;
+            SaveHotKeyBindings(gameType);
         }
 
         /// <summary>
         /// 保存热键绑定到文件
         /// </summary>
-        public bool SaveHotKeyBindings()
+        public bool SaveHotKeyBindings(GameType gameType)
         {
             try
             {
-                var dtoList = _hotKeyBindings.Select(b => new HotKeyBindingDto
+                if (!_hotKeyBindingsByGame.ContainsKey(gameType))
+                {
+                    Logger.Warn($"游戏 {gameType} 没有热键绑定数据");
+                    return false;
+                }
+
+                var bindings = _hotKeyBindingsByGame[gameType];
+                var dtoList = bindings.Select(b => new HotKeyBindingDto
                 {
                     Id = b.Id,
                     CheatCodeId = b.CheatCodeId,
@@ -157,21 +219,22 @@ namespace GameCheatHelper.Services
                 }).ToList();
 
                 var json = JsonConvert.SerializeObject(dtoList, Formatting.Indented);
+                var filePath = GetHotKeyFilePath(gameType);
 
                 // 确保目录存在
-                var directory = Path.GetDirectoryName(_defaultHotKeysPath);
+                var directory = Path.GetDirectoryName(filePath);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
                 }
 
-                File.WriteAllText(_defaultHotKeysPath, json);
-                Logger.Info($"热键绑定已保存到: {_defaultHotKeysPath}");
+                File.WriteAllText(filePath, json);
+                Logger.Info($"游戏 {gameType} 的热键绑定已保存到: {filePath}");
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "保存热键绑定失败");
+                Logger.Error(ex, $"保存游戏 {gameType} 的热键绑定失败");
                 return false;
             }
         }
@@ -179,23 +242,32 @@ namespace GameCheatHelper.Services
         /// <summary>
         /// 添加或更新热键绑定
         /// </summary>
+        /// <param name="gameType">游戏类型</param>
         /// <param name="cheatCodeId">秘籍ID</param>
         /// <param name="hotKey">热键（null表示移除热键）</param>
         /// <param name="description">描述</param>
-        public bool AddOrUpdateHotKeyBinding(string cheatCodeId, HotKey? hotKey, string description)
+        public bool AddOrUpdateHotKeyBinding(GameType gameType, string cheatCodeId, HotKey? hotKey, string description)
         {
             try
             {
+                // 确保该游戏的热键列表已初始化
+                if (!_hotKeyBindingsByGame.ContainsKey(gameType))
+                {
+                    LoadDefaultHotKeyBindings(gameType);
+                }
+
+                var bindings = _hotKeyBindingsByGame[gameType];
+
                 // 查找现有绑定
-                var existingBinding = _hotKeyBindings.FirstOrDefault(b => b.CheatCodeId == cheatCodeId);
+                var existingBinding = bindings.FirstOrDefault(b => b.CheatCodeId == cheatCodeId);
 
                 if (hotKey == null)
                 {
                     // 移除热键绑定
                     if (existingBinding != null)
                     {
-                        _hotKeyBindings.Remove(existingBinding);
-                        Logger.Info($"移除秘籍 {cheatCodeId} 的热键绑定");
+                        bindings.Remove(existingBinding);
+                        Logger.Info($"移除游戏 {gameType} 秘籍 {cheatCodeId} 的热键绑定");
                     }
                 }
                 else
@@ -205,12 +277,12 @@ namespace GameCheatHelper.Services
                         // 更新现有绑定
                         existingBinding.HotKey = hotKey;
                         existingBinding.Description = description;
-                        Logger.Info($"更新秘籍 {cheatCodeId} 的热键为: {hotKey.DisplayText}");
+                        Logger.Info($"更新游戏 {gameType} 秘籍 {cheatCodeId} 的热键为: {hotKey.DisplayText}");
                     }
                     else
                     {
                         // 添加新绑定
-                        var newId = _hotKeyBindings.Any() ? _hotKeyBindings.Max(b => b.Id) + 1 : 1;
+                        var newId = bindings.Any() ? bindings.Max(b => b.Id) + 1 : 1;
                         var binding = new HotKeyBinding
                         {
                             Id = newId,
@@ -218,17 +290,17 @@ namespace GameCheatHelper.Services
                             HotKey = hotKey,
                             Description = description
                         };
-                        _hotKeyBindings.Add(binding);
-                        Logger.Info($"添加秘籍 {cheatCodeId} 的热键绑定: {hotKey.DisplayText}");
+                        bindings.Add(binding);
+                        Logger.Info($"添加游戏 {gameType} 秘籍 {cheatCodeId} 的热键绑定: {hotKey.DisplayText}");
                     }
                 }
 
                 // 保存到文件
-                return SaveHotKeyBindings();
+                return SaveHotKeyBindings(gameType);
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "添加或更新热键绑定失败");
+                Logger.Error(ex, $"添加或更新游戏 {gameType} 的热键绑定失败");
                 return false;
             }
         }
@@ -236,20 +308,31 @@ namespace GameCheatHelper.Services
         /// <summary>
         /// 根据秘籍ID获取热键绑定
         /// </summary>
-        public HotKeyBinding? GetBindingByCheatCodeId(string cheatCodeId)
+        public HotKeyBinding? GetBindingByCheatCodeId(GameType gameType, string cheatCodeId)
         {
-            return _hotKeyBindings.FirstOrDefault(b => b.CheatCodeId == cheatCodeId);
+            if (!_hotKeyBindingsByGame.ContainsKey(gameType))
+            {
+                LoadDefaultHotKeyBindings(gameType);
+            }
+
+            return _hotKeyBindingsByGame[gameType].FirstOrDefault(b => b.CheatCodeId == cheatCodeId);
         }
 
         /// <summary>
-        /// 检查热键是否被占用
+        /// 检查热键是否被占用（仅在同一游戏内检查）
         /// </summary>
+        /// <param name="gameType">游戏类型</param>
         /// <param name="hotKey">要检查的热键</param>
         /// <param name="excludeCheatCodeId">排除的秘籍ID（编辑时使用）</param>
         /// <returns>占用该热键的秘籍ID，如果未被占用返回null</returns>
-        public string? CheckHotKeyOccupied(HotKey hotKey, string? excludeCheatCodeId = null)
+        public string? CheckHotKeyOccupied(GameType gameType, HotKey hotKey, string? excludeCheatCodeId = null)
         {
-            foreach (var binding in _hotKeyBindings)
+            if (!_hotKeyBindingsByGame.ContainsKey(gameType))
+            {
+                LoadDefaultHotKeyBindings(gameType);
+            }
+
+            foreach (var binding in _hotKeyBindingsByGame[gameType])
             {
                 if (excludeCheatCodeId != null && binding.CheatCodeId == excludeCheatCodeId)
                 {

@@ -139,7 +139,7 @@ namespace GameCheatHelper.ViewModels
             _cheatCodeService.LoadDefaultCheats();
 
             _hotKeyBindingService = new HotKeyBindingService();
-            _hotKeyBindingService.LoadDefaultHotKeyBindings();
+            // 不再在构造函数中加载热键，改为按需加载
 
             _gameDetectionService = new GameDetectionService(_configService.Config.Settings.DetectionInterval);
             _gameDetectionService.GameDetected += OnGameDetected;
@@ -324,6 +324,9 @@ namespace GameCheatHelper.ViewModels
         /// </summary>
         private void LoadCheatsForGame(GameType gameType)
         {
+            // 先加载该游戏的热键映射
+            LoadHotKeyMapForGame(gameType);
+
             CheatCodes.Clear();
 
             var cheats = _cheatCodeService.GetCheatsByGame(gameType);
@@ -334,6 +337,24 @@ namespace GameCheatHelper.ViewModels
             }
 
             Logger.Info($"加载了 {cheats.Count} 个秘籍");
+        }
+
+        /// <summary>
+        /// 加载游戏的热键映射（不注册到系统）
+        /// </summary>
+        private void LoadHotKeyMapForGame(GameType gameType)
+        {
+            _cheatHotKeyMap.Clear();
+
+            // 获取该游戏的热键绑定
+            var bindings = _hotKeyBindingService.GetBindingsByGameType(gameType, _cheatCodeService);
+
+            foreach (var binding in bindings)
+            {
+                _cheatHotKeyMap[binding.CheatCodeId] = binding.HotKey.DisplayText;
+            }
+
+            Logger.Info($"加载了 {_cheatHotKeyMap.Count} 个热键映射");
         }
 
         /// <summary>
@@ -363,10 +384,11 @@ namespace GameCheatHelper.ViewModels
             {
                 var newCheat = viewModel.GetCheatCode();
 
-                // 检查热键冲突
+                // 检查热键冲突（仅在同一游戏内检查）
                 if (viewModel.CurrentHotKey != null)
                 {
                     var conflictingCheatId = _hotKeyBindingService.CheckHotKeyOccupied(
+                        newCheat.Game,  // 游戏类型
                         viewModel.CurrentHotKey,
                         null  // 新建秘籍，不需要排除
                     );
@@ -401,7 +423,12 @@ namespace GameCheatHelper.ViewModels
                     if (viewModel.CurrentHotKey != null)
                     {
                         var description = $"{GetGameName(newCheat.Game)}: {newCheat.Description}";
-                        _hotKeyBindingService.AddOrUpdateHotKeyBinding(newCheat.Id, viewModel.CurrentHotKey, description);
+                        _hotKeyBindingService.AddOrUpdateHotKeyBinding(
+                            newCheat.Game,  // 游戏类型
+                            newCheat.Id,
+                            viewModel.CurrentHotKey,
+                            description
+                        );
 
                         // 如果当前游戏正在运行且匹配，注册热键
                         if (_currentGame != null && newCheat.Game == _currentGame.GameType && _hotKeyManager != null)
@@ -458,7 +485,7 @@ namespace GameCheatHelper.ViewModels
             var viewModel = new CheatEditViewModel(cheat);
 
             // 加载现有热键绑定
-            var existingBinding = _hotKeyBindingService.GetBindingByCheatCodeId(cheat.Id);
+            var existingBinding = _hotKeyBindingService.GetBindingByCheatCodeId(cheat.Game, cheat.Id);
             if (existingBinding != null)
             {
                 viewModel.CurrentHotKey = existingBinding.HotKey;
@@ -471,10 +498,11 @@ namespace GameCheatHelper.ViewModels
             {
                 var updatedCheat = viewModel.GetCheatCode();
 
-                // 检查热键冲突（排除当前秘籍自己）
+                // 检查热键冲突（排除当前秘籍自己，仅在同一游戏内检查）
                 if (viewModel.CurrentHotKey != null)
                 {
                     var conflictingCheatId = _hotKeyBindingService.CheckHotKeyOccupied(
+                        updatedCheat.Game,  // 游戏类型
                         viewModel.CurrentHotKey,
                         updatedCheat.Id  // 排除当前秘籍
                     );
@@ -507,7 +535,12 @@ namespace GameCheatHelper.ViewModels
                 {
                     // 更新热键绑定
                     var description = $"{GetGameName(updatedCheat.Game)}: {updatedCheat.Description}";
-                    _hotKeyBindingService.AddOrUpdateHotKeyBinding(updatedCheat.Id, viewModel.CurrentHotKey, description);
+                    _hotKeyBindingService.AddOrUpdateHotKeyBinding(
+                        updatedCheat.Game,  // 游戏类型
+                        updatedCheat.Id,
+                        viewModel.CurrentHotKey,
+                        description
+                    );
 
                     // 如果当前游戏正在运行且匹配，需要重新注册热键
                     if (_currentGame != null && updatedCheat.Game == _currentGame.GameType)
