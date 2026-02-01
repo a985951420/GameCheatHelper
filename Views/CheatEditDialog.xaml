@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="{Binding WindowTitle}"
-        Height="450"
+        Height="550"
         Width="500"
+        MinHeight="550"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
         FontFamily="{StaticResource DefaultFont}">
 
     <Grid Margin="20">

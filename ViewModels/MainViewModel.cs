@@ -296,6 +296,39 @@ namespace GameCheatHelper.ViewModels
             if (dialog.ShowDialog() == true)
             {
                 var newCheat = viewModel.GetCheatCode();
+
+                // 检查热键冲突
+                if (viewModel.CurrentHotKey != null)
+                {
+                    var conflictingCheatId = _hotKeyBindingService.CheckHotKeyOccupied(
+                        viewModel.CurrentHotKey,
+                        null  // 新建秘籍，不需要排除
+                    );
+
+                    if (conflictingCheatId != null)
+                    {
+                        // 找到冲突的秘籍
+                        var conflictingCheat = _cheatCodeService.GetCheatById(conflictingCheatId);
+                        var conflictMsg = conflictingCheat != null
+                            ? $"热键 '{viewModel.CurrentHotKey.DisplayText}' 已被秘籍 '{conflictingCheat.Description}' 使用。\n\n是否移除原有绑定并使用新的绑定？"
+                            : $"热键 '{viewModel.CurrentHotKey.DisplayText}' 已被其他秘籍使用。\n\n是否移除原有绑定并使用新的绑定？";
+
+                        var result = MessageBox.Show(
+                            conflictMsg,
+                            "热键冲突",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Warning
+                        );
+
+                        if (result != MessageBoxResult.Yes)
+                        {
+                            // 用户选择不覆盖，清除热键
+                            viewModel.CurrentHotKey = null;
+                            StatusMessage = "已取消热键绑定";
+                        }
+                    }
+                }
+
                 if (_cheatCodeService.AddCheat(newCheat))
                 {
                     // 保存热键绑定
@@ -307,13 +340,17 @@ namespace GameCheatHelper.ViewModels
                         // 如果当前游戏正在运行，注册热键
                         if (_currentGame != null && newCheat.Game == _currentGame.GameType && _hotKeyManager != null)
                         {
-                            var hotKey = viewModel.CurrentHotKey;
-                            hotKey.CheatCodeId = newCheat.Id;
-                            _hotKeyManager.RegisterHotKey(hotKey);
+                            // 重新注册所有热键
+                            _hotKeyManager.UnregisterAllHotKeys();
+                            RegisterHotKeysForGame(_currentGame.GameType);
                         }
-                    }
 
-                    StatusMessage = $"秘籍 '{newCheat.Code}' 已添加";
+                        StatusMessage = $"秘籍 '{newCheat.Code}' 已添加，热键 '{viewModel.CurrentHotKey.DisplayText}' 已绑定";
+                    }
+                    else
+                    {
+                        StatusMessage = $"秘籍 '{newCheat.Code}' 已添加";
+                    }
 
                     // 如果是当前游戏，刷新列表
                     if (_currentGame != null && newCheat.Game == _currentGame.GameType)
@@ -367,6 +404,39 @@ namespace GameCheatHelper.ViewModels
             if (dialog.ShowDialog() == true)
             {
                 var updatedCheat = viewModel.GetCheatCode();
+
+                // 检查热键冲突（排除当前秘籍自己）
+                if (viewModel.CurrentHotKey != null)
+                {
+                    var conflictingCheatId = _hotKeyBindingService.CheckHotKeyOccupied(
+                        viewModel.CurrentHotKey,
+                        updatedCheat.Id  // 排除当前秘籍
+                    );
+
+                    if (conflictingCheatId != null)
+                    {
+                        // 找到冲突的秘籍
+                        var conflictingCheat = _cheatCodeService.GetCheatById(conflictingCheatId);
+                        var conflictMsg = conflictingCheat != null
+                            ? $"热键 '{viewModel.CurrentHotKey.DisplayText}' 已被秘籍 '{conflictingCheat.Description}' 使用。\n\n是否移除原有绑定并使用新的绑定？"
+                            : $"热键 '{viewModel.CurrentHotKey.DisplayText}' 已被其他秘籍使用。\n\n是否移除原有绑定并使用新的绑定？";
+
+                        var result = MessageBox.Show(
+                            conflictMsg,
+                            "热键冲突",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Warning
+                        );
+
+                        if (result != MessageBoxResult.Yes)
+                        {
+                            // 用户选择不覆盖，恢复原有热键
+                            viewModel.CurrentHotKey = existingBinding?.HotKey;
+                            StatusMessage = "已取消热键更改";
+                        }
+                    }
+                }
+
                 if (_cheatCodeService.UpdateCheat(updatedCheat))
                 {
                     // 更新热键绑定
@@ -381,7 +451,14 @@ namespace GameCheatHelper.ViewModels
                         RegisterHotKeysForGame(_currentGame.GameType);
                     }
 
-                    StatusMessage = $"秘籍 '{updatedCheat.Code}' 已更新";
+                    if (viewModel.CurrentHotKey != null)
+                    {
+                        StatusMessage = $"秘籍 '{updatedCheat.Code}' 已更新，热键 '{viewModel.CurrentHotKey.DisplayText}' 已绑定";
+                    }
+                    else
+                    {
+                        StatusMessage = $"秘籍 '{updatedCheat.Code}' 已更新";
+                    }
 
                     // 刷新列表
                     if (_currentGame != null)
