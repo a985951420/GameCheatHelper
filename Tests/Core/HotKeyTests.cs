@@ -1,4 +1,6 @@
 using GameCheatHelper.Core.Models;
+using GameCheatHelper.Utilities;
+using System.Windows.Input;
 using Xunit;
 
 namespace GameCheatHelper.Tests.Core
@@ -14,8 +16,8 @@ namespace GameCheatHelper.Tests.Core
             // Arrange
             var hotKey = new HotKey
             {
-                Key = System.Windows.Forms.Keys.F1,
-                Modifiers = HotKeyModifiers.None
+                Key = Key.F1,
+                Modifiers = 0
             };
 
             // Act
@@ -31,8 +33,8 @@ namespace GameCheatHelper.Tests.Core
             // Arrange
             var hotKey = new HotKey
             {
-                Key = System.Windows.Forms.Keys.F1,
-                Modifiers = HotKeyModifiers.Control | HotKeyModifiers.Alt
+                Key = Key.F1,
+                Modifiers = Win32API.MOD_CONTROL | Win32API.MOD_ALT
             };
 
             // Act
@@ -50,20 +52,20 @@ namespace GameCheatHelper.Tests.Core
             // Arrange
             var hotKey1 = new HotKey
             {
-                Key = System.Windows.Forms.Keys.F1,
-                Modifiers = HotKeyModifiers.Control
+                Key = Key.F1,
+                Modifiers = Win32API.MOD_CONTROL
             };
 
             var hotKey2 = new HotKey
             {
-                Key = System.Windows.Forms.Keys.F1,
-                Modifiers = HotKeyModifiers.Control
+                Key = Key.F1,
+                Modifiers = Win32API.MOD_CONTROL
             };
 
             var hotKey3 = new HotKey
             {
-                Key = System.Windows.Forms.Keys.F2,
-                Modifiers = HotKeyModifiers.Control
+                Key = Key.F2,
+                Modifiers = Win32API.MOD_CONTROL
             };
 
             // Act & Assert

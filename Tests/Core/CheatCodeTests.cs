@@ -60,8 +60,8 @@ namespace GameCheatHelper.Tests.Core
             var cheat = new CheatCode();
 
             // Assert
-            Assert.True(cheat.Enabled, "秘籍默认应该是启用状态");
-            Assert.Equal("其他", cheat.Category, "默认分类应该是'其他'");
+            Assert.True(cheat.Enabled); // 秘籍默认应该是启用状态
+            Assert.Equal("通用", cheat.Category); // 默认分类应该是'通用'
         }
     }
 }

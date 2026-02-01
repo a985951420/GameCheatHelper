@@ -31,13 +31,13 @@ namespace GameCheatHelper.Tests.Services
 
             // Act
             var wc3Cheats = service.GetCheatsByGame(GameCheatHelper.Core.Models.GameType.Warcraft3);
-            var sc1Cheats = service.GetCheatsByGame(GameCheatHelper.Core.Models.GameType.StarCraft1);
+            var sc1Cheats = service.GetCheatsByGame(GameCheatHelper.Core.Models.GameType.StarCraft);
 
             // Assert
             Assert.NotEmpty(wc3Cheats);
             Assert.NotEmpty(sc1Cheats);
             Assert.All(wc3Cheats, c => Assert.Equal(GameCheatHelper.Core.Models.GameType.Warcraft3, c.Game));
-            Assert.All(sc1Cheats, c => Assert.Equal(GameCheatHelper.Core.Models.GameType.StarCraft1, c.Game));
+            Assert.All(sc1Cheats, c => Assert.Equal(GameCheatHelper.Core.Models.GameType.StarCraft, c.Game));
         }
 
         [Theory]
