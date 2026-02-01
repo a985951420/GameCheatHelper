@@ -94,6 +94,15 @@ namespace GameCheatHelper.Views
             _viewModel?.DeleteCheatCommand.Execute(null);
         }
 
+        /// <summary>
+        /// 游戏类型选择改变事件
+        /// </summary>
+        private void GameTypeComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            // 事件由 ViewModel 的 SelectedGameType 属性变化自动处理
+            // 此方法保留用于可能的 UI 特定逻辑
+        }
+
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);

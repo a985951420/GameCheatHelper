@@ -31,6 +31,8 @@ namespace GameCheatHelper.ViewModels
         private GameInfo? _currentGame;
         private ObservableCollection<CheatCodeViewModel> _cheatCodes;
         private Dictionary<string, string> _cheatHotKeyMap;
+        private KeyValuePair<GameType, string> _selectedGameType;
+        private GameType _manuallySelectedGameType;
 
         /// <summary>
         /// 游戏状态文本
@@ -57,6 +59,30 @@ namespace GameCheatHelper.ViewModels
         {
             get => _cheatCodes;
             set => SetProperty(ref _cheatCodes, value);
+        }
+
+        /// <summary>
+        /// 游戏类型字典（用于下拉框）
+        /// </summary>
+        public Dictionary<GameType, string> GameTypes { get; } = new Dictionary<GameType, string>
+        {
+            { GameType.Warcraft3, "魔兽争霸3" },
+            { GameType.StarCraft, "星际争霸1" }
+        };
+
+        /// <summary>
+        /// 当前选择的游戏类型
+        /// </summary>
+        public KeyValuePair<GameType, string> SelectedGameType
+        {
+            get => _selectedGameType;
+            set
+            {
+                if (SetProperty(ref _selectedGameType, value))
+                {
+                    OnGameTypeChanged(value.Key);
+                }
+            }
         }
 
         /// <summary>
@@ -134,11 +160,18 @@ namespace GameCheatHelper.ViewModels
             DeleteCheatCommand = new RelayCommand(DeleteCheat, () => SelectedCheat != null);
             SearchCommand = new RelayCommand<string>(Search);
 
-            // 启动游戏检测
+            // 默认选择魔兽争霸3
+            _manuallySelectedGameType = GameType.Warcraft3;
+            _selectedGameType = GameTypes.First(x => x.Key == GameType.Warcraft3);
+
+            // 启动时默认加载魔兽争霸3秘籍
+            LoadCheatsForGame(GameType.Warcraft3);
+
+            // 启动游戏检测（辅助功能）
             _gameDetectionService.Start();
 
             Logger.Info("MainViewModel 初始化完成");
-            StatusMessage = "应用程序已启动，等待检测游戏...";
+            StatusMessage = "已加载魔兽争霸3秘籍，等待检测游戏...";
         }
 
         /// <summary>
@@ -149,7 +182,13 @@ namespace GameCheatHelper.ViewModels
             Application.Current.Dispatcher.Invoke(() =>
             {
                 _currentGame = gameInfo;
-                GameStatus = gameInfo.DisplayName;
+                GameStatus = $"{gameInfo.DisplayName} (已检测)";
+
+                // 自动切换到检测到的游戏类型
+                _manuallySelectedGameType = gameInfo.GameType;
+                _selectedGameType = GameTypes.First(x => x.Key == gameInfo.GameType);
+                OnPropertyChanged(nameof(SelectedGameType));
+
                 StatusMessage = $"检测到 {gameInfo.DisplayName}，正在注册热键...";
 
                 // 注册该游戏的热键
@@ -174,10 +213,39 @@ namespace GameCheatHelper.ViewModels
 
                 _currentGame = null;
                 GameStatus = "未检测到游戏";
-                StatusMessage = "游戏已关闭";
-                CheatCodes.Clear();
+                StatusMessage = "游戏已关闭，可继续管理秘籍";
                 _cheatHotKeyMap.Clear();
+
+                // 保持显示当前选择的游戏秘籍
+                // 不再清空秘籍列表
             });
+        }
+
+        /// <summary>
+        /// 游戏类型改变事件
+        /// </summary>
+        private void OnGameTypeChanged(GameType gameType)
+        {
+            _manuallySelectedGameType = gameType;
+
+            // 如果游戏正在运行且类型不同，注销当前热键
+            if (_currentGame != null && _currentGame.GameType != gameType)
+            {
+                _hotKeyManager?.UnregisterAllHotKeys();
+                _cheatHotKeyMap.Clear();
+            }
+
+            // 加载选择的游戏秘籍
+            LoadCheatsForGame(gameType);
+
+            // 如果游戏正在运行且类型匹配，重新注册热键
+            if (_currentGame != null && _currentGame.GameType == gameType)
+            {
+                RegisterHotKeysForGame(gameType);
+            }
+
+            StatusMessage = $"已切换到 {GetGameName(gameType)}";
+            Logger.Info($"用户手动选择游戏: {gameType}");
         }
 
         /// <summary>
@@ -276,10 +344,8 @@ namespace GameCheatHelper.ViewModels
             StatusMessage = "刷新中...";
             _cheatCodeService.LoadDefaultCheats();
 
-            if (_currentGame != null)
-            {
-                LoadCheatsForGame(_currentGame.GameType);
-            }
+            // 刷新当前选择的游戏秘籍列表
+            LoadCheatsForGame(_manuallySelectedGameType);
 
             StatusMessage = "刷新完成";
         }
@@ -337,7 +403,7 @@ namespace GameCheatHelper.ViewModels
                         var description = $"{GetGameName(newCheat.Game)}: {newCheat.Description}";
                         _hotKeyBindingService.AddOrUpdateHotKeyBinding(newCheat.Id, viewModel.CurrentHotKey, description);
 
-                        // 如果当前游戏正在运行，注册热键
+                        // 如果当前游戏正在运行且匹配，注册热键
                         if (_currentGame != null && newCheat.Game == _currentGame.GameType && _hotKeyManager != null)
                         {
                             // 重新注册所有热键
@@ -352,10 +418,10 @@ namespace GameCheatHelper.ViewModels
                         StatusMessage = $"秘籍 '{newCheat.Code}' 已添加";
                     }
 
-                    // 如果是当前游戏，刷新列表
-                    if (_currentGame != null && newCheat.Game == _currentGame.GameType)
+                    // 如果是当前选择的游戏，刷新列表
+                    if (newCheat.Game == _manuallySelectedGameType)
                     {
-                        LoadCheatsForGame(_currentGame.GameType);
+                        LoadCheatsForGame(_manuallySelectedGameType);
                     }
                 }
                 else
@@ -443,7 +509,7 @@ namespace GameCheatHelper.ViewModels
                     var description = $"{GetGameName(updatedCheat.Game)}: {updatedCheat.Description}";
                     _hotKeyBindingService.AddOrUpdateHotKeyBinding(updatedCheat.Id, viewModel.CurrentHotKey, description);
 
-                    // 如果当前游戏正在运行，需要重新注册热键
+                    // 如果当前游戏正在运行且匹配，需要重新注册热键
                     if (_currentGame != null && updatedCheat.Game == _currentGame.GameType)
                     {
                         // 注销所有热键并重新注册
@@ -460,11 +526,8 @@ namespace GameCheatHelper.ViewModels
                         StatusMessage = $"秘籍 '{updatedCheat.Code}' 已更新";
                     }
 
-                    // 刷新列表
-                    if (_currentGame != null)
-                    {
-                        LoadCheatsForGame(_currentGame.GameType);
-                    }
+                    // 刷新当前选择的游戏秘籍列表
+                    LoadCheatsForGame(_manuallySelectedGameType);
                 }
                 else
                 {
@@ -510,11 +573,8 @@ namespace GameCheatHelper.ViewModels
                 {
                     StatusMessage = $"秘籍 '{SelectedCheat.Code}' 已删除";
 
-                    // 刷新列表
-                    if (_currentGame != null)
-                    {
-                        LoadCheatsForGame(_currentGame.GameType);
-                    }
+                    // 刷新当前选择的游戏秘籍列表
+                    LoadCheatsForGame(_manuallySelectedGameType);
                 }
                 else
                 {
@@ -528,14 +588,9 @@ namespace GameCheatHelper.ViewModels
         /// </summary>
         private void Search(string? keyword)
         {
-            if (_currentGame == null)
-            {
-                StatusMessage = "请先启动游戏";
-                return;
-            }
-
+            // 使用手动选择的游戏类型进行搜索
             var results = _cheatCodeService.SearchCheats(keyword ?? string.Empty)
-                .Where(c => c.Game == _currentGame.GameType)
+                .Where(c => c.Game == _manuallySelectedGameType)
                 .ToList();
 
             CheatCodes.Clear();

@@ -25,12 +25,33 @@
                 Padding="10">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="🎮 当前游戏: "
+                <!-- 游戏选择 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="0,0,20,0">
+                    <TextBlock Text="🎮 游戏: "
+                               Foreground="White"
+                               FontSize="14"
+                               VerticalAlignment="Center"
+                               Margin="0,0,5,0"/>
+                    <ComboBox x:Name="GameTypeComboBox"
+                              ItemsSource="{Binding GameTypes}"
+                              SelectedItem="{Binding SelectedGameType}"
+                              DisplayMemberPath="Value"
+                              SelectedValuePath="Key"
+                              Width="150"
+                              Height="28"
+                              FontSize="13"
+                              VerticalAlignment="Center"
+                              SelectionChanged="GameTypeComboBox_SelectionChanged"/>
+                </StackPanel>
+
+                <!-- 游戏检测状态 -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="📡 检测状态: "
                                Foreground="White"
                                FontSize="14"
                                VerticalAlignment="Center"/>
@@ -41,7 +62,7 @@
                                VerticalAlignment="Center"/>
                 </StackPanel>
 
-                <Button Grid.Column="1"
+                <Button Grid.Column="2"
                         Content="⚙ 设置"
                         Background="Transparent"
                         Foreground="White"
