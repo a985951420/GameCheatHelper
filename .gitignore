@@ -111,3 +111,6 @@ Desktop.ini
 # Release packages
 *.zip
 *.msi
+
+# Publish output
+publish/

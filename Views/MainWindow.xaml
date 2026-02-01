@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="GameCheatHelper - 游戏秘籍助手"
+        Title="游戏秘籍助手 v1.0.0 - by Time"
         Height="600"
         Width="800"
         MinHeight="500"
@@ -158,9 +158,31 @@
                 BorderThickness="0,1,0,0"
                 Padding="10,5">
             <Grid>
-                <TextBlock Text="{Binding StatusMessage}"
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusMessage}"
                            VerticalAlignment="Center"/>
-                <TextBlock Text="v1.0.0"
+
+                <TextBlock Grid.Column="1"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Center"
+                           Foreground="#757575"
+                           Margin="0,0,15,0">
+                    <Hyperlink NavigateUri="https://github.com/a985951420/GameCheatHelper"
+                               RequestNavigate="Hyperlink_RequestNavigate"
+                               TextDecorations="None"
+                               Foreground="#2196F3">
+                        <Run Text="GitHub: a985951420/GameCheatHelper"/>
+                    </Hyperlink>
+                </TextBlock>
+
+                <TextBlock Grid.Column="2"
+                           Text="v1.0.0 | 开发：Time"
                            HorizontalAlignment="Right"
                            VerticalAlignment="Center"
                            Foreground="#757575"/>

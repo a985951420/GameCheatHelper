@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Navigation;
 using GameCheatHelper.ViewModels;
 using NLog;
 
@@ -101,6 +103,26 @@ namespace GameCheatHelper.Views
         {
             // 事件由 ViewModel 的 SelectedGameType 属性变化自动处理
             // 此方法保留用于可能的 UI 特定逻辑
+        }
+
+        /// <summary>
+        /// 超链接点击事件 - 打开GitHub链接
+        /// </summary>
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = e.Uri.AbsoluteUri,
+                    UseShellExecute = true
+                });
+                e.Handled = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "打开链接失败");
+            }
         }
 
         protected override void OnClosed(EventArgs e)

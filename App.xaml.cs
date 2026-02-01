@@ -54,7 +54,7 @@ namespace GameCheatHelper
             {
                 Icon = SystemIcons.Application, // 使用默认图标
                 Visible = true,
-                Text = "GameCheatHelper - 游戏秘籍助手"
+                Text = "游戏秘籍助手 v1.0.0 - by Time"
             };
 
             // 双击托盘图标显示主窗口

@@ -1,4 +1,9 @@
-# GameCheatHelper 用户手册
+# 游戏秘籍助手 v1.0.0 - 用户手册
+
+**开发者**: Time
+**项目地址**: https://github.com/a985951420/GameCheatHelper
+
+---
 
 ## 目录
 
@@ -344,8 +349,9 @@
 
 如果您遇到问题或有建议，欢迎联系：
 
-- GitHub Issues: [https://github.com/yourrepo/GameCheatHelper/issues](https://github.com/yourrepo/GameCheatHelper/issues)
-- Email: support@gamecheathelper.com
+- **GitHub Issues**: https://github.com/a985951420/GameCheatHelper/issues
+- **项目主页**: https://github.com/a985951420/GameCheatHelper
+- **开发者**: Time
 
 ---
 

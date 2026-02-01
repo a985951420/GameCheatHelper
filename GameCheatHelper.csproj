@@ -8,11 +8,22 @@
     <Nullable>enable</Nullable>
     <AssemblyName>GameCheatHelper</AssemblyName>
     <Version>1.0.0</Version>
-    <Authors>GameCheatHelper Team</Authors>
-    <Company>GameCheatHelper</Company>
-    <Product>GameCheatHelper</Product>
-    <Description>游戏秘籍快捷输入工具 - 支持魔兽争霸3和星际争霸1</Description>
-    <Copyright>Copyright © 2026</Copyright>
+    <Authors>Time</Authors>
+    <Company>Time</Company>
+    <Product>游戏秘籍助手</Product>
+    <Description>游戏秘籍快捷输入工具 - 支持魔兽争霸3和星际争霸1 | GitHub: https://github.com/a985951420/GameCheatHelper</Description>
+    <Copyright>Copyright © 2026 Time</Copyright>
+    <RepositoryUrl>https://github.com/a985951420/GameCheatHelper</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <!-- 发布配置 - 单文件exe -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
   </PropertyGroup>
 
   <ItemGroup>

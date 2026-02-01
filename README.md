@@ -1,4 +1,10 @@
-# GameCheatHelper - 游戏秘籍快捷输入工具
+# 游戏秘籍助手 - GameCheatHelper
+
+**开发者**: Time
+**项目地址**: https://github.com/a985951420/GameCheatHelper
+**版本**: v1.0.0
+
+---
 
 ## 项目简介
 
@@ -71,7 +77,7 @@ GameCheatHelper/
 
 ### 技术栈
 
-- **框架**: .NET 6.0
+- **框架**: .NET 8.0
 - **UI**: WPF (Windows Presentation Foundation)
 - **架构**: MVVM 模式
 - **API**: Windows API (User32.dll)
@@ -145,10 +151,11 @@ MIT License
 
 ## 联系方式
 
-- 项目主页: <repository-url>
-- 问题反馈: <issues-url>
+- **项目主页**: https://github.com/a985951420/GameCheatHelper
+- **问题反馈**: https://github.com/a985951420/GameCheatHelper/issues
+- **开发者**: Time
 
 ---
 
 **版本**: v1.0.0
-**最后更新**: 2026-01-28
+**最后更新**: 2026-02-01
