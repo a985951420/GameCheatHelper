@@ -98,12 +98,18 @@ namespace GameCheatHelper.Controls
 
             var key = e.Key;
 
+            // 处理 Alt 组合键的特殊情况
+            // 在 WPF 中，Alt+其他键会使 e.Key 返回 Key.System
+            if (key == Key.System)
+            {
+                key = e.SystemKey;
+            }
+
             // 忽略单独的修饰键
             if (key == Key.LeftCtrl || key == Key.RightCtrl ||
                 key == Key.LeftAlt || key == Key.RightAlt ||
                 key == Key.LeftShift || key == Key.RightShift ||
-                key == Key.LWin || key == Key.RWin ||
-                key == Key.System)
+                key == Key.LWin || key == Key.RWin)
             {
                 return;
             }
@@ -122,12 +128,6 @@ namespace GameCheatHelper.Controls
 
             if (Keyboard.Modifiers.HasFlag(ModifierKeys.Windows))
                 modifiers |= Win32API.MOD_WIN;
-
-            // System键是Alt键
-            if (e.Key == Key.System)
-            {
-                key = e.SystemKey;
-            }
 
             // 创建热键对象
             var hotKey = new HotKey
