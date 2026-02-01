@@ -127,51 +127,262 @@
 
             <!-- 关于 -->
             <TabItem Header="关于">
-                <StackPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Text="GameCheatHelper"
-                               FontSize="24"
-                               FontWeight="Bold"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,10"/>
-                    <TextBlock Text="游戏秘籍快捷输入工具"
-                               FontSize="14"
-                               HorizontalAlignment="Center"
-                               Foreground="#757575"
-                               Margin="0,0,0,20"/>
-                    <TextBlock Text="版本: 1.0.0"
-                               FontSize="13"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,5"/>
-                    <TextBlock Text="支持游戏: 魔兽争霸3、星际争霸1"
-                               FontSize="13"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,20"/>
-                    <TextBlock Text="Copyright © 2026 GameCheatHelper Team"
-                               FontSize="11"
-                               HorizontalAlignment="Center"
-                               Foreground="#757575"
-                               Margin="0,0,0,30"/>
-                    <Border Background="#E3F2FD"
-                            BorderBrush="{StaticResource PrimaryBrush}"
-                            BorderThickness="1"
-                            Padding="15"
-                            CornerRadius="5">
-                        <TextBlock TextWrapping="Wrap"
-                                   FontSize="12"
-                                   MaxWidth="400">
-                            <Run Text="使用说明:" FontWeight="Bold"/>
-                            <LineBreak/>
-                            <LineBreak/>
-                            <Run Text="1. 启动魔兽争霸3或星际争霸1游戏"/>
-                            <LineBreak/>
-                            <Run Text="2. 工具会自动检测游戏并注册热键"/>
-                            <LineBreak/>
-                            <Run Text="3. 在游戏中按下对应热键即可自动输入秘籍"/>
-                            <LineBreak/>
-                            <Run Text="4. 支持自定义秘籍和热键绑定"/>
-                        </TextBlock>
-                    </Border>
-                </StackPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="20">
+                        <!-- 应用信息 -->
+                        <StackPanel HorizontalAlignment="Center" Margin="0,10,0,20">
+                            <TextBlock Text="GameCheatHelper"
+                                       FontSize="24"
+                                       FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,10"/>
+                            <TextBlock Text="游戏秘籍快捷输入工具"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       Foreground="#757575"
+                                       Margin="0,0,0,10"/>
+                            <TextBlock Text="版本: 1.0.0"
+                                       FontSize="13"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,5"/>
+                            <TextBlock Text="支持游戏: 魔兽争霸3、星际争霸1"
+                                       FontSize="13"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,5"/>
+                            <TextBlock Text="开发者: Time"
+                                       FontSize="12"
+                                       HorizontalAlignment="Center"
+                                       Foreground="#757575"
+                                       Margin="0,0,0,5"/>
+                            <TextBlock Text="Copyright © 2026 GameCheatHelper Team"
+                                       FontSize="11"
+                                       HorizontalAlignment="Center"
+                                       Foreground="#757575"
+                                       Margin="0,0,0,10"/>
+                        </StackPanel>
+
+                        <!-- 快速开始 -->
+                        <GroupBox Header="快速开始" Margin="0,0,0,15">
+                            <StackPanel Margin="10">
+                                <TextBlock TextWrapping="Wrap" Margin="0,5">
+                                    <Run Text="1. 启动应用程序" FontWeight="SemiBold"/>
+                                    <LineBreak/>
+                                    <Run Text="   双击 GameCheatHelper.exe 运行程序，程序会显示主窗口并开始检测游戏" Foreground="#666"/>
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap" Margin="0,5">
+                                    <Run Text="2. 启动游戏" FontWeight="SemiBold"/>
+                                    <LineBreak/>
+                                    <Run Text="   打开《魔兽争霸3》或《星际争霸1》，程序会自动检测到游戏" Foreground="#666"/>
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap" Margin="0,5">
+                                    <Run Text="3. 使用热键输入秘籍" FontWeight="SemiBold"/>
+                                    <LineBreak/>
+                                    <Run Text="   在游戏中按下预设的热键（如 F1、F2、F3），程序会自动输入对应的秘籍代码" Foreground="#666"/>
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap" Margin="0,5">
+                                    <Run Text="4. 查看秘籍列表" FontWeight="SemiBold"/>
+                                    <LineBreak/>
+                                    <Run Text="   在主窗口的秘籍列表中查看所有可用的秘籍，每个秘籍旁边显示其绑定的热键" Foreground="#666"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 主要特性 -->
+                        <GroupBox Header="主要特性" Margin="0,0,0,15">
+                            <StackPanel Margin="10">
+                                <TextBlock Text="🎮 自动检测游戏进程" Margin="0,3"/>
+                                <TextBlock Text="⌨️ 全局热键快速输入秘籍" Margin="0,3"/>
+                                <TextBlock Text="📝 支持自定义秘籍和热键绑定" Margin="0,3"/>
+                                <TextBlock Text="🔍 秘籍搜索和分类管理" Margin="0,3"/>
+                                <TextBlock Text="🌐 系统托盘最小化" Margin="0,3"/>
+                                <TextBlock Text="⚙️ 可配置的输入延迟和检测间隔" Margin="0,3"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 魔兽争霸3秘籍 -->
+                        <GroupBox Header="魔兽争霸3 内置秘籍" Margin="0,0,0,15">
+                            <StackPanel Margin="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="180"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="greedisgood" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="获得500金和木材" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="keysersoze" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="获得500金币" Margin="0,2"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="iseedeadpeople" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="显示全图" Margin="0,2"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="whosyourdaddy" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="无敌模式" Margin="0,2"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="thereisnospoon" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="无限魔法" Margin="0,2"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="warpten" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Text="快速建造和训练" Margin="0,2"/>
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="synergy" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="6" Grid.Column="1" Text="关闭科技树需求" Margin="0,2"/>
+                                    <TextBlock Grid.Row="7" Grid.Column="0" Text="pointbreak" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="7" Grid.Column="1" Text="移除食物上限" Margin="0,2"/>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 星际争霸1秘籍 -->
+                        <GroupBox Header="星际争霸1 内置秘籍" Margin="0,0,0,15">
+                            <StackPanel Margin="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="show me the money" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="获得10000水晶和瓦斯" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="whats mine is mine" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="获得500水晶" Margin="0,2"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="black sheep wall" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="显示全图" Margin="0,2"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="power overwhelming" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="无敌模式" Margin="0,2"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="operation cwal" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="快速建造" Margin="0,2"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="the gathering" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" Text="技能无限能量" Margin="0,2"/>
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="something for nothing" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="6" Grid.Column="1" Text="所有科技升级" Margin="0,2"/>
+                                    <TextBlock Grid.Row="7" Grid.Column="0" Text="food for thought" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="7" Grid.Column="1" Text="取消人口限制" Margin="0,2"/>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 默认热键 -->
+                        <GroupBox Header="默认热键绑定" Margin="0,0,0,15">
+                            <StackPanel Margin="10">
+                                <TextBlock Text="魔兽争霸3:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <Grid Margin="10,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="F1" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="greedisgood" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="F2" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="iseedeadpeople" Margin="0,2"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="F3" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="whosyourdaddy" Margin="0,2"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="F4" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="thereisnospoon" Margin="0,2"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="F5" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="warpten" Margin="0,2"/>
+                                </Grid>
+                                <TextBlock Text="星际争霸1:" FontWeight="SemiBold" Margin="0,5,0,5"/>
+                                <Grid Margin="10,0,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="F1" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" Text="show me the money" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="F2" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Text="black sheep wall" Margin="0,2"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="F3" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="power overwhelming" Margin="0,2"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="F4" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" Text="operation cwal" Margin="0,2"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="F5" FontFamily="Consolas" Margin="0,2"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" Text="the gathering" Margin="0,2"/>
+                                </Grid>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 常见问题 -->
+                        <GroupBox Header="常见问题" Margin="0,0,0,15">
+                            <StackPanel Margin="10">
+                                <TextBlock TextWrapping="Wrap" Margin="0,5">
+                                    <Run Text="Q: 程序无法检测到游戏？" FontWeight="SemiBold"/>
+                                    <LineBreak/>
+                                    <Run Text="A: 确保游戏正在运行，检查进程名称是否正确，尝试以管理员身份运行程序。" Foreground="#666"/>
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap" Margin="0,5">
+                                    <Run Text="Q: 按热键后秘籍没有输入？" FontWeight="SemiBold"/>
+                                    <LineBreak/>
+                                    <Run Text="A: 确保游戏窗口处于激活状态，检查热键是否冲突，在设置中增加输入延迟。" Foreground="#666"/>
+                                </TextBlock>
+                                <TextBlock TextWrapping="Wrap" Margin="0,5">
+                                    <Run Text="Q: 秘籍输入不完整或乱码？" FontWeight="SemiBold"/>
+                                    <LineBreak/>
+                                    <Run Text="A: 在设置中增加输入延迟，确保游戏处于窗口模式，关闭其他可能干扰键盘输入的程序。" Foreground="#666"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 技术支持 -->
+                        <GroupBox Header="技术支持" Margin="0,0,0,15">
+                            <StackPanel Margin="10">
+                                <TextBlock TextWrapping="Wrap" Margin="0,3">
+                                    <Run Text="项目主页: "/>
+                                    <Hyperlink NavigateUri="https://github.com/a985951420/GameCheatHelper"
+                                               RequestNavigate="Hyperlink_RequestNavigate">
+                                        <Run Text="https://github.com/a985951420/GameCheatHelper"/>
+                                    </Hyperlink>
+                                </TextBlock>
+                                <TextBlock Text="日志文件位于: logs\" Margin="0,3"/>
+                                <TextBlock Text="配置文件位于: Data\" Margin="0,3"/>
+                                <TextBlock TextWrapping="Wrap" Margin="0,3">
+                                    <Run Text="遇到问题请查看日志文件或在 GitHub 提交 Issue" Foreground="#666"/>
+                                </TextBlock>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 版权信息 -->
+                        <Border Background="#F5F5F5"
+                                Padding="10"
+                                CornerRadius="5"
+                                Margin="0,10,0,10">
+                            <TextBlock HorizontalAlignment="Center"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap">
+                                <Run Text="感谢使用 GameCheatHelper！祝您游戏愉快！ 🎮" FontWeight="SemiBold"/>
+                                <LineBreak/>
+                                <Run Text="MIT License" FontSize="10" Foreground="#999"/>
+                            </TextBlock>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
 
@@ -181,32 +392,53 @@
                 BorderBrush="#E0E0E0"
                 BorderThickness="0,1,0,0"
                 Padding="10">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="恢复默认"
-                        Click="ResetButton_Click"
-                        Width="100"
-                        Height="32"
-                        Margin="0,0,10,0"
-                        Background="#E0E0E0"
-                        BorderThickness="0"
-                        Cursor="Hand"/>
-                <Button Content="保存"
-                        Click="SaveButton_Click"
-                        Width="100"
-                        Height="32"
-                        Margin="0,0,10,0"
-                        Background="{StaticResource PrimaryBrush}"
-                        Foreground="White"
-                        BorderThickness="0"
-                        Cursor="Hand"/>
-                <Button Content="取消"
-                        Click="CancelButton_Click"
-                        Width="100"
-                        Height="32"
-                        Background="#E0E0E0"
-                        BorderThickness="0"
-                        Cursor="Hand"/>
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 左侧：发布按钮 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Content="📦 生成发布包"
+                            Click="PublishButton_Click"
+                            Width="120"
+                            Height="32"
+                            Background="#4CAF50"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            ToolTip="执行发布脚本生成单文件可执行程序"/>
+                </StackPanel>
+
+                <!-- 右侧：设置按钮组 -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="恢复默认"
+                            Click="ResetButton_Click"
+                            Width="100"
+                            Height="32"
+                            Margin="0,0,10,0"
+                            Background="#E0E0E0"
+                            BorderThickness="0"
+                            Cursor="Hand"/>
+                    <Button Content="保存"
+                            Click="SaveButton_Click"
+                            Width="100"
+                            Height="32"
+                            Margin="0,0,10,0"
+                            Background="{StaticResource PrimaryBrush}"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Cursor="Hand"/>
+                    <Button Content="取消"
+                            Click="CancelButton_Click"
+                            Width="100"
+                            Height="32"
+                            Background="#E0E0E0"
+                            BorderThickness="0"
+                            Cursor="Hand"/>
+                </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </Window>
