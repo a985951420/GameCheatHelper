@@ -207,6 +207,32 @@
                         </Button.Style>
                     </Button>
                 </Border>
+
+                <!-- 星际争霸1 建造加速按钮 -->
+                <Border Margin="6,0,0,0"
+                        BorderBrush="#9C27B0"
+                        BorderThickness="1"
+                        CornerRadius="3">
+                    <Button Padding="12,5"
+                            FontWeight="Bold"
+                            Background="#F3E5F5"
+                            Foreground="#6A1B9A"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            ToolTip="启动后建造/训练几乎瞬间完成（只影响自己，多人模式可用）"
+                            Command="{Binding ToggleBuildSpeedBoostCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Content" Value="⚡ 建造加速"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsBuildSpeedBoostActive}" Value="True">
+                                        <Setter Property="Content" Value="⏹ 停止加速"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Border>
             </StackPanel>
         </Grid>
 

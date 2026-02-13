@@ -17,9 +17,11 @@ namespace GameCheatHelper.Services
         private readonly MemoryEditor _memoryEditor;
         private Timer? _supplyTimer;
         private Timer? _resourceTimer;
+        private Timer? _buildSpeedTimer;
         private int _targetProcessId;
         private bool _isSupplyCapRemoved;
         private bool _isResourceBoostActive;
+        private bool _isBuildSpeedBoostActive;
         private bool _disposed;
 
         #region 星际争霸1 (Brood War 1.16.1) 内存地址
@@ -54,6 +56,14 @@ namespace GameCheatHelper.Services
         // ============================================================
         private static readonly IntPtr SC_MINERALS_BASE = new IntPtr(0x0057F0F0);
         private static readonly IntPtr SC_GAS_BASE = new IntPtr(0x0057F120);
+
+        // ============================================================
+        // 星际争霸1 建造速度相关内存地址
+        // 每个玩家的建造速度修改器: 0x00584140 (Player 0 起始, 每个玩家+1字节)
+        // 值设为1=正常, 值设为0=极速建造
+        // ============================================================
+        private static readonly IntPtr SC_BUILD_SPEED_BASE = new IntPtr(0x006509C0);
+        private const int PLAYER_BUILD_SPEED_ENTRY_SIZE = 1;
 
         // 内部值常量
         private const int SUPPLY_200_INTERNAL = 400;    // 200人口对应内部值400
@@ -105,6 +115,27 @@ namespace GameCheatHelper.Services
         /// 资源加成状态变化事件
         /// </summary>
         public event EventHandler<bool>? ResourceBoostStatusChanged;
+
+        /// <summary>
+        /// 建造加速是否已激活
+        /// </summary>
+        public bool IsBuildSpeedBoostActive
+        {
+            get => _isBuildSpeedBoostActive;
+            private set
+            {
+                if (_isBuildSpeedBoostActive != value)
+                {
+                    _isBuildSpeedBoostActive = value;
+                    BuildSpeedBoostStatusChanged?.Invoke(this, value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 建造加速状态变化事件
+        /// </summary>
+        public event EventHandler<bool>? BuildSpeedBoostStatusChanged;
 
         /// <summary>
         /// 构造函数
@@ -444,6 +475,95 @@ namespace GameCheatHelper.Services
         }
 
         /// <summary>
+        /// 启动建造加速（给自己）
+        /// </summary>
+        public bool StartBuildSpeedBoost(int processId, int playerIndex = 0)
+        {
+            try
+            {
+                Logger.Info($"开始启动建造加速, 玩家: {playerIndex + 1}");
+
+                if (!_memoryEditor.IsAttached)
+                {
+                    if (!_memoryEditor.Attach(processId))
+                    {
+                        Logger.Error("无法附加到星际争霸进程");
+                        return false;
+                    }
+                }
+
+                // 立即设置一次
+                IntPtr buildSpeedAddr = IntPtr.Add(SC_BUILD_SPEED_BASE, playerIndex * PLAYER_BUILD_SPEED_ENTRY_SIZE);
+                byte[] speedValue = new byte[] { 0 }; // 0=极速建造
+                _memoryEditor.WriteBytes(buildSpeedAddr, speedValue, 1);
+
+                StopBuildSpeedBoost();
+
+                _buildSpeedTimer = new Timer(1000); // 每1秒维持一次
+                _buildSpeedTimer.Elapsed += (s, e) =>
+                {
+                    try
+                    {
+                        try
+                        {
+                            var process = Process.GetProcessById(processId);
+                            if (process.HasExited)
+                            {
+                                StopBuildSpeedBoost();
+                                return;
+                            }
+                        }
+                        catch
+                        {
+                            StopBuildSpeedBoost();
+                            return;
+                        }
+
+                        if (!_memoryEditor.IsAttached)
+                        {
+                            _memoryEditor.Attach(processId);
+                        }
+
+                        // 持续维持建造加速
+                        IntPtr addr = IntPtr.Add(SC_BUILD_SPEED_BASE, playerIndex * PLAYER_BUILD_SPEED_ENTRY_SIZE);
+                        byte[] value = new byte[] { 0 };
+                        _memoryEditor.WriteBytes(addr, value, 1);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "维持建造加速时发生错误");
+                    }
+                };
+                _buildSpeedTimer.AutoReset = true;
+                _buildSpeedTimer.Start();
+
+                IsBuildSpeedBoostActive = true;
+                Logger.Info("✅ 建造加速已启动");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "启动建造加速失败");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 停止建造加速
+        /// </summary>
+        public void StopBuildSpeedBoost()
+        {
+            if (_buildSpeedTimer != null)
+            {
+                _buildSpeedTimer.Stop();
+                _buildSpeedTimer.Dispose();
+                _buildSpeedTimer = null;
+                IsBuildSpeedBoostActive = false;
+                Logger.Info("建造加速已停止");
+            }
+        }
+
+        /// <summary>
         /// 释放资源
         /// </summary>
         public void Dispose()
@@ -452,6 +572,7 @@ namespace GameCheatHelper.Services
             {
                 StopSupplyMaintainer();
                 StopResourceBoost();
+                StopBuildSpeedBoost();
                 _memoryEditor?.Dispose();
                 _disposed = true;
                 Logger.Info("内存秘籍服务已释放");
