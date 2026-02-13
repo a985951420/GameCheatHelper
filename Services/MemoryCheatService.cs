@@ -16,8 +16,10 @@ namespace GameCheatHelper.Services
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly MemoryEditor _memoryEditor;
         private Timer? _supplyTimer;
+        private Timer? _resourceTimer;
         private int _targetProcessId;
         private bool _isSupplyCapRemoved;
+        private bool _isResourceBoostActive;
         private bool _disposed;
 
         #region 星际争霸1 (Brood War 1.16.1) 内存地址
@@ -45,10 +47,20 @@ namespace GameCheatHelper.Services
         // Protoss 补给上限: 0x00582324
         private static readonly IntPtr SC_SUPPLY_MAX_PROTOSS = new IntPtr(0x00582324);
 
+        // ============================================================
+        // 星际争霸1 资源相关内存地址
+        // 水晶矿(Minerals): 0x0057F0F0 (Player 0 起始, 每个玩家+4)
+        // 瓦斯(Gas):        0x0057F120 (Player 0 起始, 每个玩家+4)
+        // ============================================================
+        private static readonly IntPtr SC_MINERALS_BASE = new IntPtr(0x0057F0F0);
+        private static readonly IntPtr SC_GAS_BASE = new IntPtr(0x0057F120);
+
         // 内部值常量
         private const int SUPPLY_200_INTERNAL = 400;    // 200人口对应内部值400
         private const int SUPPLY_MAX_INTERNAL = 1600;   // 设置为800人口上限（内部值1600）
         private const int PLAYER_ENTRY_SIZE = 4;        // 每个玩家条目4字节
+        private const int DEFAULT_ADD_MINERALS = 10000;  // 默认加矿量
+        private const int DEFAULT_ADD_GAS = 10000;       // 默认加气量
 
         #endregion
 
@@ -72,6 +84,27 @@ namespace GameCheatHelper.Services
         /// 人口上限状态变化事件
         /// </summary>
         public event EventHandler<bool>? SupplyCapStatusChanged;
+
+        /// <summary>
+        /// 资源加成是否已激活
+        /// </summary>
+        public bool IsResourceBoostActive
+        {
+            get => _isResourceBoostActive;
+            private set
+            {
+                if (_isResourceBoostActive != value)
+                {
+                    _isResourceBoostActive = value;
+                    ResourceBoostStatusChanged?.Invoke(this, value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 资源加成状态变化事件
+        /// </summary>
+        public event EventHandler<bool>? ResourceBoostStatusChanged;
 
         /// <summary>
         /// 构造函数
@@ -227,6 +260,138 @@ namespace GameCheatHelper.Services
         }
 
         /// <summary>
+        /// 给自己加资源（水晶矿+瓦斯）
+        /// </summary>
+        /// <param name="processId">星际争霸进程ID</param>
+        /// <param name="playerIndex">玩家索引（默认0=玩家1）</param>
+        /// <param name="addMinerals">增加的水晶矿量</param>
+        /// <param name="addGas">增加的瓦斯量</param>
+        /// <returns>是否成功</returns>
+        public bool AddStarCraftResources(int processId, int playerIndex = 0, int addMinerals = DEFAULT_ADD_MINERALS, int addGas = DEFAULT_ADD_GAS)
+        {
+            try
+            {
+                Logger.Info($"给玩家{playerIndex + 1}加资源, PID: {processId}, 矿: +{addMinerals}, 气: +{addGas}");
+
+                if (!_memoryEditor.IsAttached)
+                {
+                    if (!_memoryEditor.Attach(processId))
+                    {
+                        Logger.Error("无法附加到星际争霸进程，请确保以管理员权限运行");
+                        return false;
+                    }
+                }
+
+                int playerOffset = playerIndex * PLAYER_ENTRY_SIZE;
+                IntPtr mineralsAddr = IntPtr.Add(SC_MINERALS_BASE, playerOffset);
+                IntPtr gasAddr = IntPtr.Add(SC_GAS_BASE, playerOffset);
+
+                // 读取当前资源
+                _memoryEditor.ReadInt32(mineralsAddr, out int currentMinerals);
+                _memoryEditor.ReadInt32(gasAddr, out int currentGas);
+                Logger.Info($"当前资源 - 水晶矿: {currentMinerals}, 瓦斯: {currentGas}");
+
+                // 写入新的资源值（当前值 + 增加量）
+                bool result1 = _memoryEditor.WriteInt32(mineralsAddr, currentMinerals + addMinerals);
+                bool result2 = _memoryEditor.WriteInt32(gasAddr, currentGas + addGas);
+
+                if (result1 && result2)
+                {
+                    Logger.Info($"✅ 资源已增加 - 水晶矿: {currentMinerals} → {currentMinerals + addMinerals}, 瓦斯: {currentGas} → {currentGas + addGas}");
+                }
+
+                return result1 && result2;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "加资源时发生错误");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 启动持续加资源定时器（每5秒自动加资源）
+        /// </summary>
+        public bool StartResourceBoost(int processId, int playerIndex = 0, int addMinerals = DEFAULT_ADD_MINERALS, int addGas = DEFAULT_ADD_GAS)
+        {
+            try
+            {
+                if (!_memoryEditor.IsAttached)
+                {
+                    if (!_memoryEditor.Attach(processId))
+                    {
+                        Logger.Error("无法附加到星际争霸进程");
+                        return false;
+                    }
+                }
+
+                // 先立即加一次
+                AddStarCraftResources(processId, playerIndex, addMinerals, addGas);
+
+                StopResourceBoost();
+
+                _resourceTimer = new Timer(5000); // 每5秒加一次
+                _resourceTimer.Elapsed += (s, e) =>
+                {
+                    try
+                    {
+                        try
+                        {
+                            var process = Process.GetProcessById(processId);
+                            if (process.HasExited)
+                            {
+                                StopResourceBoost();
+                                return;
+                            }
+                        }
+                        catch
+                        {
+                            StopResourceBoost();
+                            return;
+                        }
+
+                        if (!_memoryEditor.IsAttached)
+                        {
+                            _memoryEditor.Attach(processId);
+                        }
+
+                        AddStarCraftResources(processId, playerIndex, addMinerals, addGas);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "持续加资源时发生错误");
+                    }
+                };
+                _resourceTimer.AutoReset = true;
+                _resourceTimer.Start();
+
+                IsResourceBoostActive = true;
+                Logger.Info($"✅ 持续加资源已启动（每5秒 +{addMinerals}矿 +{addGas}气）");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "启动持续加资源失败");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 停止持续加资源
+        /// </summary>
+        public void StopResourceBoost()
+        {
+            if (_resourceTimer != null)
+            {
+                _resourceTimer.Stop();
+                _resourceTimer.Dispose();
+                _resourceTimer = null;
+                IsResourceBoostActive = false;
+                Logger.Info("持续加资源已停止");
+            }
+        }
+
+        /// <summary>
         /// 停止补给维持定时器
         /// </summary>
         private void StopSupplyMaintainer()
@@ -286,6 +451,7 @@ namespace GameCheatHelper.Services
             if (!_disposed)
             {
                 StopSupplyMaintainer();
+                StopResourceBoost();
                 _memoryEditor?.Dispose();
                 _disposed = true;
                 Logger.Info("内存秘籍服务已释放");

@@ -162,8 +162,50 @@
                             Foreground="#E65100"
                             BorderThickness="0"
                             Cursor="Hand"
-                            ToolTip="通过内存修改解除星际争霸1的200人口上限（需要管理员权限，需先检测到游戏）"
+                            ToolTip="通过内存修改解除星际争霸1的200人口上限，多人模式下只给自己解除（需管理员权限）"
                             Command="{Binding ToggleSupplyCapCommand}"/>
+                </Border>
+
+                <!-- 星际争霸1 加钱按钮 -->
+                <Border Margin="6,0,0,0"
+                        BorderBrush="#4CAF50"
+                        BorderThickness="1"
+                        CornerRadius="3">
+                    <Button Content="💰 加钱(+10000)"
+                            Padding="12,5"
+                            FontWeight="Bold"
+                            Background="#E8F5E9"
+                            Foreground="#2E7D32"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            ToolTip="一次性给自己增加 10000水晶矿 + 10000瓦斯（多人模式可用，需管理员权限）"
+                            Command="{Binding AddResourcesCommand}"/>
+                </Border>
+
+                <!-- 星际争霸1 持续加钱按钮 -->
+                <Border Margin="6,0,0,0"
+                        BorderBrush="#FF9800"
+                        BorderThickness="1"
+                        CornerRadius="3">
+                    <Button Padding="12,5"
+                            FontWeight="Bold"
+                            Background="#FFF8E1"
+                            Foreground="#E65100"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            ToolTip="每5秒自动给自己增加 10000水晶矿 + 10000瓦斯，再次点击停止"
+                            Command="{Binding ToggleResourceBoostCommand}">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Content" Value="🔄 持续加钱"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsResourceBoostActive}" Value="True">
+                                        <Setter Property="Content" Value="⏹ 停止加钱"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </Border>
             </StackPanel>
         </Grid>
