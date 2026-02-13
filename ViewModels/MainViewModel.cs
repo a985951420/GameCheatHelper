@@ -112,6 +112,11 @@ namespace GameCheatHelper.ViewModels
         public ICommand ToggleSupplyCapCommand { get; }
 
         /// <summary>
+        /// 扫描玩家索引命令（调试用）
+        /// </summary>
+        public ICommand ScanPlayerIndexCommand { get; }
+
+        /// <summary>
         /// 刷新命令
         /// </summary>
         public ICommand RefreshCommand { get; }
@@ -185,6 +190,7 @@ namespace GameCheatHelper.ViewModels
 
             // 命令
             ToggleSupplyCapCommand = new RelayCommand(ToggleSupplyCap);
+            ScanPlayerIndexCommand = new RelayCommand(ScanPlayerIndex);
             RefreshCommand = new RelayCommand(Refresh);
             AddCheatCommand = new RelayCommand(AddCheat);
             EditCheatCommand = new RelayCommand(EditCheat, () => SelectedCheat != null);
@@ -450,6 +456,41 @@ namespace GameCheatHelper.ViewModels
                     StatusMessage = "人口上限已自动恢复（游戏可能已关闭）";
                 }
             });
+        }
+
+        /// <summary>
+        /// 扫描玩家索引（调试功能）
+        /// </summary>
+        private void ScanPlayerIndex()
+        {
+            try
+            {
+                // 检查游戏是否正在运行
+                if (_currentGame == null || _currentGame.GameType != GameType.StarCraft)
+                {
+                    StatusMessage = "⚠️ 请先启动星际争霸1，等待游戏检测后再使用";
+                    return;
+                }
+
+                StatusMessage = "🔍 正在扫描玩家索引，请查看日志文件...";
+                _memoryCheatService.ScanForPlayerIndex(_currentGame.ProcessId);
+                StatusMessage = "✅ 扫描完成！请打开 logs 文件夹查看日志";
+
+                MessageBox.Show(
+                    "扫描完成！\n\n" +
+                    "请打开软件目录下的 logs 文件夹，查看最新的日志文件。\n" +
+                    "日志中会显示每个玩家索引(0-7)的资源值，\n" +
+                    "找到与你游戏中资源数量匹配的那一项，记下对应的索引号。\n\n" +
+                    "然后可以临时修改代码测试该索引。",
+                    "扫描完成",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "扫描玩家索引失败");
+                StatusMessage = $"❌ 扫描失败: {ex.Message}";
+            }
         }
 
         /// <summary>

@@ -147,6 +147,54 @@ namespace GameCheatHelper.Services
         }
 
         /// <summary>
+        /// 扫描并查找当前玩家的索引（用于多人模式调试）
+        /// 通过检查哪个玩家槽位的资源值在合理范围内来判断
+        /// </summary>
+        public int ScanForPlayerIndex(int processId)
+        {
+            try
+            {
+                Logger.Info("🔍 开始扫描玩家索引...");
+
+                if (!_memoryEditor.IsAttached)
+                {
+                    if (!_memoryEditor.Attach(processId))
+                    {
+                        Logger.Error("无法附加到星际争霸进程");
+                        return -1;
+                    }
+                }
+
+                // 扫描所有8个可能的玩家槽位
+                for (int i = 0; i < 8; i++)
+                {
+                    int playerOffset = i * PLAYER_ENTRY_SIZE;
+                    IntPtr mineralsAddr = IntPtr.Add(SC_MINERALS_BASE, playerOffset);
+                    IntPtr gasAddr = IntPtr.Add(SC_GAS_BASE, playerOffset);
+
+                    _memoryEditor.ReadInt32(mineralsAddr, out int minerals);
+                    _memoryEditor.ReadInt32(gasAddr, out int gas);
+
+                    Logger.Info($"玩家 {i}: 矿物={minerals}, 瓦斯={gas} (地址: 0x{mineralsAddr.ToInt64():X})");
+
+                    // 如果资源值在合理范围内（0-100000），可能是当前玩家
+                    if (minerals >= 0 && minerals < 100000 && gas >= 0 && gas < 100000)
+                    {
+                        Logger.Info($"✅ 可能的玩家索引: {i} (矿物={minerals}, 瓦斯={gas})");
+                    }
+                }
+
+                Logger.Info("扫描完成，请查看上面的日志判断哪个是你的玩家索引");
+                return -1; // 返回-1表示需要手动判断
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "扫描玩家索引时发生错误");
+                return -1;
+            }
+        }
+
+        /// <summary>
         /// 解除星际争霸1人口上限
         /// </summary>
         /// <param name="processId">星际争霸进程ID</param>
@@ -317,14 +365,32 @@ namespace GameCheatHelper.Services
                 IntPtr mineralsAddr = IntPtr.Add(SC_MINERALS_BASE, playerOffset);
                 IntPtr gasAddr = IntPtr.Add(SC_GAS_BASE, playerOffset);
 
+                Logger.Info($"🔍 矿物地址: 0x{mineralsAddr.ToInt64():X}, 气体地址: 0x{gasAddr.ToInt64():X}");
+
                 // 读取当前资源
                 _memoryEditor.ReadInt32(mineralsAddr, out int currentMinerals);
                 _memoryEditor.ReadInt32(gasAddr, out int currentGas);
                 Logger.Info($"当前资源 - 水晶矿: {currentMinerals}, 瓦斯: {currentGas}");
 
+                // 如果读取到的值异常（<0 或 >1000000），说明地址可能不对
+                if (currentMinerals < 0 || currentMinerals > 1000000 || currentGas < 0 || currentGas > 1000000)
+                {
+                    Logger.Warn($"⚠️ 读取到异常资源值，可能内存地址不正确");
+                }
+
                 // 写入新的资源值（当前值 + 增加量）
                 bool result1 = _memoryEditor.WriteInt32(mineralsAddr, currentMinerals + addMinerals);
                 bool result2 = _memoryEditor.WriteInt32(gasAddr, currentGas + addGas);
+
+                // 验证写入
+                _memoryEditor.ReadInt32(mineralsAddr, out int verifyMinerals);
+                _memoryEditor.ReadInt32(gasAddr, out int verifyGas);
+                Logger.Info($"🔍 写入后验证 - 水晶矿: {verifyMinerals}, 瓦斯: {verifyGas}");
+
+                if (verifyMinerals != (currentMinerals + addMinerals) || verifyGas != (currentGas + addGas))
+                {
+                    Logger.Warn($"⚠️ 写入验证失败！预期 {currentMinerals + addMinerals}/{currentGas + addGas}，实际 {verifyMinerals}/{verifyGas}");
+                }
 
                 if (result1 && result2)
                 {
@@ -494,8 +560,25 @@ namespace GameCheatHelper.Services
 
                 // 立即设置一次
                 IntPtr buildSpeedAddr = IntPtr.Add(SC_BUILD_SPEED_BASE, playerIndex * PLAYER_BUILD_SPEED_ENTRY_SIZE);
+                Logger.Info($"🔍 建造加速地址: 0x{buildSpeedAddr.ToInt64():X}");
+                
+                // 先读取当前值
+                byte[] currentValue = new byte[1];
+                _memoryEditor.ReadBytes(buildSpeedAddr, currentValue, 1);
+                Logger.Info($"当前建造速度值: {currentValue[0]}");
+                
                 byte[] speedValue = new byte[] { 0 }; // 0=极速建造
                 _memoryEditor.WriteBytes(buildSpeedAddr, speedValue, 1);
+                
+                // 验证写入
+                byte[] verifyValue = new byte[1];
+                _memoryEditor.ReadBytes(buildSpeedAddr, verifyValue, 1);
+                Logger.Info($"🔍 写入后验证值: {verifyValue[0]}");
+                
+                if (verifyValue[0] != 0)
+                {
+                    Logger.Warn($"⚠️ 建造加速写入验证失败！预期 0，实际 {verifyValue[0]}");
+                }
 
                 StopBuildSpeedBoost();
 

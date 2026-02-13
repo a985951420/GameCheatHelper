@@ -233,6 +233,22 @@
                         </Button.Style>
                     </Button>
                 </Border>
+
+                <!-- 调试：扫描玩家索引按钮 -->
+                <Border Margin="6,0,0,0"
+                        BorderBrush="#607D8B"
+                        BorderThickness="1"
+                        CornerRadius="3">
+                    <Button Content="🔍 扫描玩家索引"
+                            Padding="12,5"
+                            FontWeight="Bold"
+                            Background="#ECEFF1"
+                            Foreground="#37474F"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            ToolTip="扫描所有玩家槽位的资源值，用于多人模式调试（查看日志文件）"
+                            Command="{Binding ScanPlayerIndexCommand}"/>
+                </Border>
             </StackPanel>
         </Grid>
 
