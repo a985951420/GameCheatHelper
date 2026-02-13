@@ -108,6 +108,44 @@ namespace GameCheatHelper.Utilities
 
         #endregion
 
+        #region 进程内存操作相关
+
+        /// <summary>
+        /// 打开进程（获取进程句柄）
+        /// </summary>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr OpenProcess(uint dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+
+        /// <summary>
+        /// 读取进程内存
+        /// </summary>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int dwSize, out int lpNumberOfBytesRead);
+
+        /// <summary>
+        /// 写入进程内存
+        /// </summary>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int dwSize, out int lpNumberOfBytesWritten);
+
+        /// <summary>
+        /// 关闭内核对象句柄
+        /// </summary>
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool CloseHandle(IntPtr hObject);
+
+        // 进程访问权限常量
+        public const uint PROCESS_VM_READ = 0x0010;
+        public const uint PROCESS_VM_WRITE = 0x0020;
+        public const uint PROCESS_VM_OPERATION = 0x0008;
+        public const uint PROCESS_QUERY_INFORMATION = 0x0400;
+        public const uint PROCESS_ALL_ACCESS = 0x001F0FFF;
+
+        #endregion
+
         #region 热键管理相关
 
         /// <summary>

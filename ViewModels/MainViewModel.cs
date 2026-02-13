@@ -25,6 +25,7 @@ namespace GameCheatHelper.ViewModels
         private readonly ConfigService _configService;
         private readonly CheatExecutor _cheatExecutor;
         private readonly HotKeyBindingService _hotKeyBindingService;
+        private readonly MemoryCheatService _memoryCheatService;
 
         private string _gameStatus;
         private string _statusMessage;
@@ -33,6 +34,8 @@ namespace GameCheatHelper.ViewModels
         private Dictionary<string, string> _cheatHotKeyMap;
         private KeyValuePair<GameType, string> _selectedGameType;
         private GameType _manuallySelectedGameType;
+        private bool _isSupplyCapRemoved;
+        private string _supplyCapButtonText = "🚀 解除人口上限(200)";
 
         /// <summary>
         /// 游戏状态文本
@@ -84,6 +87,29 @@ namespace GameCheatHelper.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// 人口上限是否已解除
+        /// </summary>
+        public bool IsSupplyCapRemoved
+        {
+            get => _isSupplyCapRemoved;
+            set => SetProperty(ref _isSupplyCapRemoved, value);
+        }
+
+        /// <summary>
+        /// 解除人口上限按钮文本
+        /// </summary>
+        public string SupplyCapButtonText
+        {
+            get => _supplyCapButtonText;
+            set => SetProperty(ref _supplyCapButtonText, value);
+        }
+
+        /// <summary>
+        /// 切换人口上限命令
+        /// </summary>
+        public ICommand ToggleSupplyCapCommand { get; }
 
         /// <summary>
         /// 刷新命令
@@ -153,7 +179,12 @@ namespace GameCheatHelper.ViewModels
 
             _cheatExecutor = new CheatExecutor(_configService.Config.Settings.InputDelay);
 
+            // 初始化内存秘籍服务
+            _memoryCheatService = new MemoryCheatService();
+            _memoryCheatService.SupplyCapStatusChanged += OnSupplyCapStatusChanged;
+
             // 命令
+            ToggleSupplyCapCommand = new RelayCommand(ToggleSupplyCap);
             RefreshCommand = new RelayCommand(Refresh);
             AddCheatCommand = new RelayCommand(AddCheat);
             EditCheatCommand = new RelayCommand(EditCheat, () => SelectedCheat != null);
@@ -355,6 +386,70 @@ namespace GameCheatHelper.ViewModels
             }
 
             Logger.Info($"加载了 {_cheatHotKeyMap.Count} 个热键映射");
+        }
+
+        /// <summary>
+        /// 切换解除/恢复人口上限
+        /// </summary>
+        private void ToggleSupplyCap()
+        {
+            try
+            {
+                // 检查是否选择的是星际争霸1
+                if (_manuallySelectedGameType != GameType.StarCraft)
+                {
+                    StatusMessage = "⚠️ 解除人口上限功能仅支持星际争霸1";
+                    return;
+                }
+
+                // 检查游戏是否正在运行
+                if (_currentGame == null || _currentGame.GameType != GameType.StarCraft)
+                {
+                    StatusMessage = "⚠️ 请先启动星际争霸1，等待游戏检测后再使用";
+                    return;
+                }
+
+                if (IsSupplyCapRemoved)
+                {
+                    // 恢复人口上限
+                    var success = _memoryCheatService.RestoreStarCraftSupplyCap(_currentGame.ProcessId);
+                    StatusMessage = success
+                        ? "✅ 人口上限已恢复为200"
+                        : "❌ 恢复人口上限失败";
+                }
+                else
+                {
+                    // 解除人口上限
+                    var success = _memoryCheatService.RemoveStarCraftSupplyCap(_currentGame.ProcessId);
+                    StatusMessage = success
+                        ? "✅ 人口上限已解除！现在可以突破200人口"
+                        : "❌ 解除人口上限失败，请确保以管理员权限运行";
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "切换人口上限失败");
+                StatusMessage = $"❌ 操作失败: {ex.Message}";
+            }
+        }
+
+        /// <summary>
+        /// 人口上限状态变化回调
+        /// </summary>
+        private void OnSupplyCapStatusChanged(object? sender, bool isRemoved)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                IsSupplyCapRemoved = isRemoved;
+                SupplyCapButtonText = isRemoved
+                    ? "✅ 恢复人口上限(200)"
+                    : "🚀 解除人口上限(200)";
+
+                if (!isRemoved)
+                {
+                    StatusMessage = "人口上限已自动恢复（游戏可能已关闭）";
+                }
+            });
         }
 
         /// <summary>
@@ -645,6 +740,7 @@ namespace GameCheatHelper.ViewModels
         {
             _gameDetectionService?.Dispose();
             _hotKeyManager?.Dispose();
+            _memoryCheatService?.Dispose();
             Logger.Info("MainViewModel 已释放");
         }
 

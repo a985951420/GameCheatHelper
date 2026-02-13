@@ -147,7 +147,24 @@
                         Click="EditCheatButton_Click"/>
                 <Button Content="🗑 删除"
                         Padding="10,5"
+                        Margin="0,0,10,0"
                         Click="DeleteCheatButton_Click"/>
+
+                <!-- 星际争霸1 解除人口上限按钮 -->
+                <Border Margin="10,0,0,0"
+                        BorderBrush="#FF5722"
+                        BorderThickness="1"
+                        CornerRadius="3">
+                    <Button Content="{Binding SupplyCapButtonText}"
+                            Padding="12,5"
+                            FontWeight="Bold"
+                            Background="#FFF3E0"
+                            Foreground="#E65100"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            ToolTip="通过内存修改解除星际争霸1的200人口上限（需要管理员权限，需先检测到游戏）"
+                            Command="{Binding ToggleSupplyCapCommand}"/>
+                </Border>
             </StackPanel>
         </Grid>
 
